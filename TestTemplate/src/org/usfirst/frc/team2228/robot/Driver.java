@@ -4,31 +4,20 @@ import org.usfirst.frc.team2228.robot.DriverConfig;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.XboxController;
 
 public class Driver implements DriverIF {
-	XboxController xbox;
-	Joystick joystick;
 	GenericHID controller;   // left
 	GenericHID controller2;  // right
 	
-	boolean useXbox;
-	
-	public Driver(XboxController _xbox) {
-		controller = controller2 = xbox = _xbox;
-		useXbox = true;
-	}
 	
 	public Driver(Joystick _stick) {
-		controller = controller2 = joystick = _stick;
-		useXbox = false;
+		controller = controller2 = _stick;
 	}
 	
 	public Driver(Joystick leftStick,
 			      Joystick rightStick) {
 		controller = leftStick;
 	    controller2 = rightStick;
-		useXbox = true;
 	}
 
 	@Override
@@ -48,7 +37,7 @@ public class Driver implements DriverIF {
 
 	@Override
 	public double GetThrottle() {
-		return controller.getX();
+		return controller.getRawAxis(DriverConfig.throttle);
 	}
 
 	@Override
@@ -68,7 +57,29 @@ public class Driver implements DriverIF {
 
 	@Override
 	public double GetTwist() {
-		return joystick.getTwist();
+		return controller.getY();  //twist
+	}
+	
+	public boolean GetInHighSpeed() {
+		return controller.getRawButton(DriverConfig.highSpeedEnable);
+	}
+	
+	public boolean QuickTurnLeft() {
+		return controller.getRawButton(DriverConfig.quickTurnLeft);
+	}
+	public boolean QuickTurnRight() {
+		return controller.getRawButton(DriverConfig.quickTurnRight);
+	}
+
+	
+	public boolean GetTurnSensitivityEnabled() {
+		return false;
+	}
+	public boolean GetLowSpeedFactorEnabled() {
+		return false;
+	}
+	public boolean GetThrottleSensitivityEnabled() {
+		return false;
 	}
 
 }

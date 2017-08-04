@@ -8,7 +8,14 @@ public interface DriverIF {
 		arcadeStyle,
 		mecanumStyle
 	}
-	
+
+
+	public enum JoystickSensitivity {
+		High,
+		Normal,
+		Sine,
+		Low
+	}
 	 /**
 	   * return the DriveStyle from the Driver config
 	   */
@@ -32,4 +39,12 @@ public interface DriverIF {
 	public abstract double GetX();
 	public abstract double GetY();
 	public abstract double GetTwist();
+	
+	public abstract boolean GetInHighSpeed();
+	public abstract boolean QuickTurnLeft();
+	public abstract boolean QuickTurnRight();
+	
+	public abstract boolean GetTurnSensitivityEnabled();
+	public abstract boolean GetLowSpeedFactorEnabled();
+	public abstract boolean GetThrottleSensitivityEnabled();
 }

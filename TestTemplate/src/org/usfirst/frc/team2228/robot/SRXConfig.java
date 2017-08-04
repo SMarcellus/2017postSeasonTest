@@ -22,4 +22,8 @@ public class SRXConfig {
 		public static TalonControlMode left1Mode = TalonControlMode.PercentVbus;
 		public static TalonControlMode left2Mode = TalonControlMode.Follower;
 		
+		public static boolean brakeModeEnabled = false;
+		
+		
+		
 }
