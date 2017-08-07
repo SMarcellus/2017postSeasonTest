@@ -4,9 +4,11 @@ public class TeleConfig {
 	public static final double JOY_STICK_DEADBAND = 0.1;
 	public static final double QUICK_TURN_SPEED = 0.7;
 	
-    public static final double kMaxDeltaVel = 0.2;
+    public static final double kMaxDeltaVelocity = 0.2;
     public static final double kZeroSpeedDeadBand = 0.1;
     public static final double kTurnSensitivityGain = 0.7;
+    public static final double kThrottleSensitivityLowGain = 0.7;
+    public static final double kThrottleSensitivityHighGain = 0.7;
     public static final double kLowMaxSpeedFactor = 0.7;
     public static final double kHeadingTargetAngle = 0;
     public static final double kPHeadingGain = 0;

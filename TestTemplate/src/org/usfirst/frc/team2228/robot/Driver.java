@@ -75,11 +75,20 @@ public class Driver implements DriverIF {
 	public boolean GetTurnSensitivityEnabled() {
 		return false;
 	}
-	public boolean GetLowSpeedFactorEnabled() {
-		return false;
-	}
+	
 	public boolean GetThrottleSensitivityEnabled() {
 		return false;
 	}
-
+	
+	public boolean GetSmoothMoveEnabled() {
+		return false;
+	}
+	
+	public boolean GetLowSpeedTriggered(){
+		return false;
+	}
+	
+	public boolean GetHighSpeedTriggered(){
+		return false;
+	}
 }
