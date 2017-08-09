@@ -17,5 +17,6 @@ public class TeleConfig {
     
 	
 	public static final int kLowSmooth = 5;
-	public static final int kHighSmooth = 5;
+	public static final int kHighSmooth = 35;
+	public static final int timePeriodSF = 35;
 }

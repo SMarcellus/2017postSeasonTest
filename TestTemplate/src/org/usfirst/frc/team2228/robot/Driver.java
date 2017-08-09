@@ -60,10 +60,6 @@ public class Driver implements DriverIF {
 		return controller.getY();  //twist
 	}
 	
-	public boolean GetInHighSpeed() {
-		return controller.getRawButton(DriverConfig.highSpeedEnable);
-	}
-	
 	public boolean QuickTurnLeft() {
 		return controller.getRawButton(DriverConfig.quickTurnLeft);
 	}
@@ -81,14 +77,18 @@ public class Driver implements DriverIF {
 	}
 	
 	public boolean GetSmoothMoveEnabled() {
-		return false;
+		return true;
 	}
 	
 	public boolean GetLowSpeedTriggered(){
-		return false;
+		return controller.getRawButton(DriverConfig.slowSpeedEnable);
 	}
 	
 	public boolean GetHighSpeedTriggered(){
-		return false;
+		return controller.getRawButton(DriverConfig.highSpeedEnable);
+	}
+	
+	public boolean GetSquareWaveEnabled(){
+		return controller.getRawButton(DriverConfig.enableSquareWave);		
 	}
 }

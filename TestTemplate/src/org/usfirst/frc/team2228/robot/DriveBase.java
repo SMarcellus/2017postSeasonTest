@@ -49,8 +49,27 @@ public class DriveBase {
 	
 	// smooth move parameters
 	private double previousEMAValue = 0; // -1 to 1
-	private int    timePeriodSF = 35;
 	
+	// auto parameters
+	private double autoIndexDistance = 0;
+	private int autoIndexTime = 0;
+	private double calibratedRightDistance = 0;
+	private double calibratedLeftDistance = 0;
+	private double rightDrvTrainCruiseVelSetPt = 0;
+	private double leftDrvTrainCruiseVelSetPt = 0;
+	private double rightDrvTrainAccelSetPt = 0;
+	private double leftDrvTrainAccelSetPt = 0;
+	private double rightDrvTrainTargetPosSetPt = 0;
+	private double leftDrvTrainTargetPosSetPt = 0;
+	private double kCalibratedRgtWheelCircum = SRXConfig.WHEEL_DIAMETER * Math.PI;
+	private double kCalibratedLftWheelCircum = SRXConfig.WHEEL_DIAMETER * Math.PI;
+	private double kRgtDistanceCalibration = 0;  // ?
+	private double kLftDistanceCalibration = 0;  // ?
+	private double kInchesPerCount = (SRXConfig.WHEEL_DIAMETER * Math.PI)/SRXConfig.COUNTS_PER_REV;
+	
+	// test/calibration parameters
+	private boolean isActiveHighTime = false;
+	private double squareStartTime = 0;
 	
 	// Constructor
 	public void DriveBase(DriverIF _driver)
@@ -105,15 +124,41 @@ public class DriveBase {
 	}
 	
 	public void autonomousInit() {
+		// zeroYaw
+		System.out.println("We are in AutoInit");
+		right1.setPosition(0);
+		left1.setPosition(0);
 		
 	}
 	
 	/*  indexDistanceIn is the requested distance to move in inches
 	 *  indexTime is the timeout value the move must be made within
-	 *  return true when distance or time is reached
+	 *  
 	 */
-	public boolean driveIndexRobot(double indexDistanceIn, int indexTime) {
-		return true;
+	public void driveIndexRobot(double indexDistanceIn, int indexTime) {
+		// check for change or no? in calibrated distance
+		//if ((autoIndexDistance != indexDistanceIn) && (autoIndexTime != indexTime)) {
+			calibratedRightDistance = indexDistanceIn * kRgtDistanceCalibration;
+			rightDrvTrainCruiseVelSetPt = (1.5*(calibratedRightDistance / indexTime)*60)
+					/ kCalibratedRgtWheelCircum;
+			rightDrvTrainAccelSetPt = ((1.5*(indexDistanceIn / indexTime)*60)
+					/ kCalibratedRgtWheelCircum)
+					/ (indexTime * .33333);
+			rightDrvTrainTargetPosSetPt = calibratedRightDistance / kInchesPerCount;
+			
+			calibratedLeftDistance = indexDistanceIn * kRgtDistanceCalibration;
+			leftDrvTrainCruiseVelSetPt = (1.5*(calibratedLeftDistance / indexTime)*60)
+					/ kCalibratedLftWheelCircum;
+			leftDrvTrainAccelSetPt = ((1.5*(indexDistanceIn / indexTime)*60)
+					/ kCalibratedLftWheelCircum)
+					/ (indexTime * .33333);
+			leftDrvTrainTargetPosSetPt = calibratedLeftDistance / kInchesPerCount;
+		//}
+		right1.setMotionMagicCruiseVelocity(rightDrvTrainCruiseVelSetPt);
+		right1.setMotionMagicAcceleration(rightDrvTrainAccelSetPt);
+		left1.setMotionMagicCruiseVelocity(leftDrvTrainCruiseVelSetPt);
+		left1.setMotionMagicAcceleration(leftDrvTrainAccelSetPt);
+		
 	}
 	
 	/*  heading is the requested degrees of rotation
@@ -205,12 +250,12 @@ public class DriveBase {
 				} else {
 					smoothFactor = TeleConfig.kLowSmooth;
 				}			
-			} else { // driver has switched directions
+			} else { // driver has switched directions, we're tipping!
 				fThrottle = 0;
 				smoothFactor = TeleConfig.kHighSmooth;
 			}
 			/*
-			* Expoential Moving Average Filter (EMA) is a recursive low pass filter
+			* Exponential Moving Average Filter (EMA) is a recursive low pass filter
 			* that can change its gain to address filter response
 			* Range of smoothFactor is 0 to 1; where smoothFactor = 0 (no smoothing)
 			* smoothFactor = .99999 high smoothing
@@ -219,7 +264,6 @@ public class DriveBase {
 			* Time period on iterative robot is approx 20ms
 			*/
 			fThrottle = previousEMAValue + (1-smoothFactor) * (deltaValue);
-			previousEMAValue = fThrottle;
 			
 			// If we are within the zero speed dead band set the gain for a high
 			// response filter(low smoothing) and set the speed to zero
@@ -227,6 +271,7 @@ public class DriveBase {
 			  smoothFactor = TeleConfig.kLowSmooth;
 			  fThrottle = 0;
 			}
+			previousEMAValue = fThrottle;
 		}
 		return fThrottle;
 	}
@@ -279,5 +324,64 @@ public class DriveBase {
 		  turnValue *= TeleConfig.kLowMaxSpeedFactor;
 		}	
 	}
+	
+	/*
+	* Test programs to calibrate the robot drive system
+	*/
+	/**
+	* driveTestMtrSquareWave method
+	* Team/Date/Author
+	* By pressing and holding a button(left/Right) on the joystick a
+	* square wave will be generated for PID tuning
+	*/
+	public void driveTestMtrSquareWave(int driveTrainSide) {
+		if (driver.GetSquareWaveEnabled()){
+			
+		    if (!squareWaveActive) {
+			  isActiveHighTime = true;
+			  squareWaveActive = true;
+			  squareStartTime = Timer.getFPGATimestamp();
+		    }
+		
+		  if (isActiveHighTime){
+			if (squareStartTime + SRXConfig.kSQWaveHighTime > Timer.getFPGATimestamp()) {
+				// time to switch to low 
+				squareStartTime = Timer.getFPGATimestamp();
+				isActiveHighTime = false;
+			}
+		  } else {
+				if (squareStartTime + SRXConfig.kSQWaveLowTime > Timer.getFPGATimestamp()) {
+					// time to switch to high
+					squareStartTime = Timer.getFPGATimestamp();
+					isActiveHighTime = true;
+				}  
+		  }
+		  
+		  if (isActiveHighTime) {
+			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
+				right1.set(SRXConfig.kRightSideHighSpeed);
+			} else {
+				left1.set(SRXConfig.kLeftSideHighSpeed);
+			}
+		  } else {
+			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
+				right1.set(SRXConfig.kRightSideLowSpeed);
+			} else {
+				left1.set(SRXConfig.kLeftSideLowSpeed);
+			}
+		  }
+	  } else {
+		  squareWaveActive = false;
+	  }
+	}
+	
+	public void driveTestJog(int motorID){
+		
+	}
+	
+	public void driveTestStraightIndex(int motorID){
+		
+	}
+	
 
 }

@@ -24,6 +24,22 @@ public class SRXConfig {
 		
 		public static boolean brakeModeEnabled = false;
 		
+		// CTRE CIMCoder magnetic quadrature (4) encoder 20 pulse per turn
+		//  AndyMark tough box mini 14:50 to 16:48 
+		// 857 = (50/14)*(48/16)*20*4
+		//public static final double COUNTS_PER_REV = 857.0;
+		// gear box changes to 14:50 19:45 
+		public static final double COUNTS_PER_REV = 676.0;
+		public static final double WHEEL_DIAMETER = 6.0; // inches
 		
+		public static final double COUNTS_INCH = COUNTS_PER_REV / (WHEEL_DIAMETER * Math.PI);
 		
+		//testing and calibration
+		public static final double kRightSideHighSpeed = 0.75;
+		public static final double kLeftSideHighSpeed = 0.75;
+		public static final double kRightSideLowSpeed = 0.25;
+		public static final double kLeftSideLowSpeed = 0.25;
+		public static final double kSQWaveHighTime = 500.0;
+		public static final double kSQWaveLowTime = 500.0;
 }
+	

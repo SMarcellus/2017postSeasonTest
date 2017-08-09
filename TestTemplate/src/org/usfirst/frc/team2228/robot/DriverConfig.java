@@ -32,11 +32,13 @@ public class DriverConfig {
 	public static int XBOX_D_PAD_DOWN = 4;
 	public static int XBOX_D_PAD_LEFT = 4;
 	
-	// define the DriveBase controls
+	// define the DriveBase teleop controls
     public static int throttle = XBOX_LEFT_STICK_Y_AXIS;
     public static int turn = XBOX_RIGHT_STICK_X_AXIS;
-    public static int slowSpeedEnable = 0;
-    public static int highSpeedEnable = 0;
+    public static int slowSpeedEnable = XBOX_LEFT_TRIGGER;
+    public static int highSpeedEnable = XBOX_RIGHT_TRIGGER;
+    public static int turnSensitivityEnabled = 0;
+    public static int throttleSensitivityEnabled = 0;
     public static int enableChessyDrive = 0;
     public static int enableTankDrive = 0;
     public static int breakawayRight180 = 0;
@@ -47,5 +49,6 @@ public class DriverConfig {
 	public static DriverIF.DriveStyle myStyle = DriverIF.DriveStyle.chessyStyle;
 	public static boolean isPIDEnabled = false;
 	
-	
+	// define the DriveBase test/calibration controls
+	public static int enableSquareWave = XBOX_A_BUTTON;
 }

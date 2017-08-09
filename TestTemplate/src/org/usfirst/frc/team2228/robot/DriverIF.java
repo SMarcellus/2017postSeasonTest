@@ -40,7 +40,6 @@ public interface DriverIF {
 	public abstract double GetY();
 	public abstract double GetTwist();
 	
-	public abstract boolean GetInHighSpeed();
 	public abstract boolean QuickTurnLeft();
 	public abstract boolean QuickTurnRight();
 	
@@ -50,4 +49,8 @@ public interface DriverIF {
 	public abstract boolean GetLowSpeedTriggered();
 	public abstract boolean GetHighSpeedTriggered();
 	
+	 /**
+	   * testing and calibration
+	   */
+	public abstract boolean GetSquareWaveEnabled();
 }
