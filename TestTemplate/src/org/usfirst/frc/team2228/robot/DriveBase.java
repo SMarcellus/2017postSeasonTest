@@ -71,10 +71,11 @@ public class DriveBase {
 	private boolean isActiveHighTime = false;
 	private double squareStartTime = 0;
 	
+	
+
 	// Constructor
-	public void DriveBase(DriverIF _driver)
+	public DriveBase(DriverIF _driver)
 	{
-		driver = _driver;
 		right1 = new CANTalon(SRXConfig.RIGHT_ONE_DRIVE); // master
 		right2 = new CANTalon(SRXConfig.RIGHT_TWO_DRIVE);
 		left1 = new CANTalon(SRXConfig.LEFT_ONE_DRIVE);  // master
@@ -334,6 +335,17 @@ public class DriveBase {
 	* By pressing and holding a button(left/Right) on the joystick a
 	* square wave will be generated for PID tuning
 	*/
+    public void testInit() {    	    	
+    }
+    
+    /**
+     * This function is called periodically during test mode
+     */
+    public void testPeriodic() {
+    	// some way to choose a test function
+    	     
+    }
+    
 	public void driveTestMtrSquareWave(int driveTrainSide) {
 		if (driver.GetSquareWaveEnabled()){
 			

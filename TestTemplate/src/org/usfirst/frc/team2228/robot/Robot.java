@@ -2,10 +2,10 @@
 package org.usfirst.frc.team2228.robot;
 
 import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 /**
  * The VM is configured to automatically run this class, and to call the
  * functions corresponding to each mode, as described in the IterativeRobot
@@ -18,6 +18,10 @@ public class Robot extends IterativeRobot {
     final String customAuto = "My Auto";
     String autoSelected;
     SendableChooser chooser;
+    private Joystick joystick;
+    private Driver driver;
+    private DriveBase driveBase;
+    
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -28,6 +32,12 @@ public class Robot extends IterativeRobot {
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
+
+        // put axis and button mapping in DriverConfig
+		joystick = new Joystick(1/*RobotMap.RIGHT_SIDE_JOYSTICK_ONE*/);
+		driver = new Driver(joystick);
+		// generic drive base
+		driveBase = new DriveBase(driver);
     }
     
 	/**
@@ -43,6 +53,7 @@ public class Robot extends IterativeRobot {
     	autoSelected = (String) chooser.getSelected();
 //		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
+		driveBase.autonomousInit();
     }
 
     /**
@@ -60,17 +71,33 @@ public class Robot extends IterativeRobot {
     	}
     }
 
+    /*   
+     * *Initialization code for teleop mode should go here
+     * @see edu.wpi.first.wpilibj.IterativeRobot#teleopInit()
+     */
+    public void teleopInit() {
+    	driveBase.teleopInit();    	
+    }
     /**
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-        
+
+		driveBase.autonomousInit();
+    }
+    /*   
+     * *Initialization code for test mode should go here
+     * @see edu.wpi.first.wpilibj.IterativeRobot#testInit()
+     */
+    public void testInit() {
+    	driveBase.testInit();    	
     }
     
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
+    	driveBase.testPeriodic();  
     
     }
     
