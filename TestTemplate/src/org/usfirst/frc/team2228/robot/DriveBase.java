@@ -70,6 +70,7 @@ public class DriveBase {
 	// test/calibration parameters
 	private boolean isActiveHighTime = false;
 	private double squareStartTime = 0;
+	private short lastChoice = 0;
 	
 	
 
@@ -124,6 +125,10 @@ public class DriveBase {
 		left2.enableBrakeMode(SRXConfig.brakeModeEnabled);
 	}
 	
+	public DriveBase() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public void autonomousInit() {
 		// zeroYaw
 		System.out.println("We are in AutoInit");
@@ -335,14 +340,36 @@ public class DriveBase {
 	* By pressing and holding a button(left/Right) on the joystick a
 	* square wave will be generated for PID tuning
 	*/
-    public void testInit() {    	    	
+    public void testInit() {  
+    	SmartDashboard.putNumber("runTest", 0);
     }
     
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-    	// some way to choose a test function
+    	// some way to choose a test function 	
+    	short choice = (short)SmartDashboard.getNumber("runTest", 0);
+    	boolean newRequest =  (lastChoice != choice);
+    	lastChoice = choice;
+    	switch (choice) {
+    	  case 1: {
+    		  
+ 
+    		  if (newRequest) {
+    		   System.out.println("start choice 1");
+    		  }
+    	  break;
+    	  }
+    	  
+    	  default: {
+    		  if (newRequest){
+       		   System.out.println("choice defaulted");
+       		  }
+    	  }
+    		   
+    	}
+    	
     	     
     }
     

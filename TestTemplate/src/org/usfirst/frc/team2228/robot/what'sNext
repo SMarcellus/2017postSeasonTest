@@ -1,0 +1,10 @@
+ - set up hooks for test programs/calibration
+ - set up the PIDF values
+ - unit test what's there
+ - add comments/descriptions of what's there
+ - add logging and debug information
+ - separate autonomous programming
+ - need test for
+    - drive short distance by encoder count (open loop)
+    - drive distance by setPosition (closed loop)
+    - drive distance by setVelocity?

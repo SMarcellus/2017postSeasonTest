@@ -24,6 +24,20 @@ public class SRXConfig {
 		
 		public static boolean brakeModeEnabled = false;
 		
+		// closed loop parameters
+		// Proportional, Integration, Differential, Feedfoward
+		// ramp rate is maximum change in voltage volts/sec
+		public static int default_profile = 0;
+		public static double rightP = 0.2;
+		public static double rightI = 0;
+		public static double rightD = 0;
+		public static double rightFF = 0;
+		//public static double closeLoopRampRate = 0;
+		public static double leftP = 0.2;
+		public static double leftI = 0;
+		public static double leftD = 0;
+		public static double leftFF = 0;
+		
 		// CTRE CIMCoder magnetic quadrature (4) encoder 20 pulse per turn
 		//  AndyMark tough box mini 14:50 to 16:48 
 		// 857 = (50/14)*(48/16)*20*4

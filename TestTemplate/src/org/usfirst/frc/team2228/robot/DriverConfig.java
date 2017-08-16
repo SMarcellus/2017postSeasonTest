@@ -27,10 +27,12 @@ public class DriverConfig {
 	public static int XBOX_RIGHT_STICK_BUTTON = 10;
 	public static int XBOX_SILVER_GUIDE_BUTTON = 13;
 	// pov
+	/*
 	public static int XBOX_D_PAD_UP = 4;
 	public static int XBOX_D_PAD_RIGHT = 4;
 	public static int XBOX_D_PAD_DOWN = 4;
 	public static int XBOX_D_PAD_LEFT = 4;
+	*/
 	
 	// define the DriveBase teleop controls
     public static int throttle = XBOX_LEFT_STICK_Y_AXIS;
