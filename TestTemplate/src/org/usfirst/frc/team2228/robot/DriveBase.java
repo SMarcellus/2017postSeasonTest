@@ -1,12 +1,8 @@
 package org.usfirst.frc.team2228.robot;
 
-import com.ctre.CANTalon;
-import com.ctre.CANTalon.FeedbackDevice;
-import com.ctre.CANTalon.TalonControlMode;
+
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.Timer;
@@ -15,133 +11,68 @@ import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveBase {
-	
-	private RobotDrive drive;
-	private DriverIF driver;
-	
-	// drive motor controllerss
-	private CANTalon right1;
-	private CANTalon left1;
-	private CANTalon right2;
-	private CANTalon left2;
+	protected DriverIF driver;
 	
 	// class variables
-	private double currentRobotAngle = 0;
-	private double throttleValue = 0;
-	private double turnValue = 0;
-	private double deltaThrottleValue = 0;
-	private double headingError = 0;
-	private double previousHeadingError = 0;
+	protected double currentRobotAngle = 0;
+	protected double throttleValue = 0;
+	protected double turnValue = 0;
+	protected double deltaThrottleValue = 0;
+	protected double headingError = 0;
+	protected double previousHeadingError = 0;
 	
 	// driver request states
-	private boolean lowSpeedEnabled = false;
-	private boolean driveStraightEnabled = false;
-	private boolean headingModuleEnabled = false;
-	private boolean brakeEnabled = false;
-	private boolean squareWaveActive = false;
-	private boolean jogActive = false;
-	private boolean moveXDistanceActive = false;
+	protected boolean lowSpeedEnabled = false;
+	protected boolean driveStraightEnabled = false;
+	protected boolean headingModuleEnabled = false;
+	protected boolean brakeEnabled = false;
+	protected boolean squareWaveActive = false;
+	protected boolean jogActive = false;
+	protected boolean moveXDistanceActive = false;
 	
 	// any toggle states
-	private boolean lowSpeedFactorEnabled = false;
-	private boolean lowSpeedTriggered = false;
-	private boolean highSpeedTriggered = false;
+	protected boolean lowSpeedFactorEnabled = false;
+	protected boolean lowSpeedTriggered = false;
+	protected boolean highSpeedTriggered = false;
 	
 	// smooth move parameters
 	private double previousEMAValue = 0; // -1 to 1
 	
 	// auto parameters
-	private double autoIndexDistance = 0;
-	private int autoIndexTime = 0;
-	private double calibratedRightDistance = 0;
-	private double calibratedLeftDistance = 0;
-	private double rightDrvTrainCruiseVelSetPt = 0;
-	private double leftDrvTrainCruiseVelSetPt = 0;
-	private double rightDrvTrainAccelSetPt = 0;
-	private double leftDrvTrainAccelSetPt = 0;
-	private double rightDrvTrainTargetPosSetPt = 0;
-	private double leftDrvTrainTargetPosSetPt = 0;
-	private double kCalibratedRgtWheelCircum = SRXConfig.WHEEL_DIAMETER * Math.PI;
-	private double kCalibratedLftWheelCircum = SRXConfig.WHEEL_DIAMETER * Math.PI;
-	private double kRgtDistanceCalibration = 0;  // ?
-	private double kLftDistanceCalibration = 0;  // ?
-	private double kInchesPerCount = (SRXConfig.WHEEL_DIAMETER * Math.PI)/SRXConfig.COUNTS_PER_REV;
-	
-	// test/calibration parameters
-	private boolean isActiveHighTime = false;
-	private double squareStartTime = 0;
-	private short lastChoice = 0;
+	protected double autoIndexDistance = 0;
+	protected int autoIndexTime = 0;
+	protected double calibratedRightDistance = 0;
+	protected double calibratedLeftDistance = 0;
+	protected double rightDrvTrainCruiseVelSetPt = 0;
+	protected double leftDrvTrainCruiseVelSetPt = 0;
+	protected double rightDrvTrainAccelSetPt = 0;
+	protected double leftDrvTrainAccelSetPt = 0;
+	protected double rightDrvTrainTargetPosSetPt = 0;
+	protected double leftDrvTrainTargetPosSetPt = 0;
+	protected double kCalibratedRgtWheelCircum = SRXConfig.WHEEL_DIAMETER * Math.PI;
+	protected double kCalibratedLftWheelCircum = SRXConfig.WHEEL_DIAMETER * Math.PI;
+	protected double kRgtDistanceCalibration = 0;  // ?
+	protected double kLftDistanceCalibration = 0;  // ?
+	protected double kInchesPerCount = (SRXConfig.WHEEL_DIAMETER * Math.PI)/SRXConfig.COUNTS_PER_REV;
+
 	
 	
 
 	// Constructor
 	public DriveBase(DriverIF _driver)
 	{
-		right1 = new CANTalon(SRXConfig.RIGHT_ONE_DRIVE); // master
-		right2 = new CANTalon(SRXConfig.RIGHT_TWO_DRIVE);
-		left1 = new CANTalon(SRXConfig.LEFT_ONE_DRIVE);  // master
-		left2 = new CANTalon(SRXConfig.LEFT_TWO_DRIVE);
-		
-		if (SRXConfig.rightEncoderEnabled)
-		{
-			right1.setFeedbackDevice(SRXConfig.rightFeedback);
-		}
-		
-		if (SRXConfig.leftEncoderEnabled)
-		{
-			left1.setFeedbackDevice(SRXConfig.leftFeedback);
-		}
-		
-		right1.changeControlMode(SRXConfig.right1Mode);
-		right2.changeControlMode(SRXConfig.right2Mode);
-		if (SRXConfig.right2Mode == TalonControlMode.Follower) {
-			right2.set(right1.getDeviceID());
-			right2.enableControl();
-		}
-			
-		left1.changeControlMode(SRXConfig.left1Mode);
-		left2.changeControlMode(SRXConfig.left2Mode);
-		if (SRXConfig.left2Mode == TalonControlMode.Follower) {
-			left2.set(left1.getDeviceID());
-			left2.enableControl();
-		}		
-		
-		drive = new RobotDrive(right1, left1);
-		
-		// Set peak and nominal output voltage levels of motor controllers
-		right1.configNominalOutputVoltage(+0.0f, -0.0f);
-		right1.configPeakOutputVoltage(+12.0f, -12.0f);
-		right2.configNominalOutputVoltage(+0.0f, -0.0f);
-		right2.configPeakOutputVoltage(+12.0f, -12.0f);
-		left1.configNominalOutputVoltage(+0.0f, -0.0f);
-		left1.configPeakOutputVoltage(+12.0f, -12.0f);
-		left2.configNominalOutputVoltage(+0.0f, -0.0f);
-		left2.configPeakOutputVoltage(+12.0f, -12.0f);
-		
-		// Disable brake mode in all drive motors, motors will coast to a stop
-		right1.enableBrakeMode(SRXConfig.brakeModeEnabled);
-		right2.enableBrakeMode(SRXConfig.brakeModeEnabled);
-		left1.enableBrakeMode(SRXConfig.brakeModeEnabled);
-		left2.enableBrakeMode(SRXConfig.brakeModeEnabled);
+      driver = _driver;
 	}
 	
 	public DriveBase() {
 		// TODO Auto-generated constructor stub
-	}
-
-	public void autonomousInit() {
-		// zeroYaw
-		System.out.println("We are in AutoInit");
-		right1.setPosition(0);
-		left1.setPosition(0);
-		
 	}
 	
 	/*  indexDistanceIn is the requested distance to move in inches
 	 *  indexTime is the timeout value the move must be made within
 	 *  
 	 */
-	public void driveIndexRobot(double indexDistanceIn, int indexTime) {
+	public void setCruiseAndAccelSetPoints(double indexDistanceIn, int indexTime) {
 		// check for change or no? in calibrated distance
 		//if ((autoIndexDistance != indexDistanceIn) && (autoIndexTime != indexTime)) {
 			calibratedRightDistance = indexDistanceIn * kRgtDistanceCalibration;
@@ -160,10 +91,6 @@ public class DriveBase {
 					/ (indexTime * .33333);
 			leftDrvTrainTargetPosSetPt = calibratedLeftDistance / kInchesPerCount;
 		//}
-		right1.setMotionMagicCruiseVelocity(rightDrvTrainCruiseVelSetPt);
-		right1.setMotionMagicAcceleration(rightDrvTrainAccelSetPt);
-		left1.setMotionMagicCruiseVelocity(leftDrvTrainCruiseVelSetPt);
-		left1.setMotionMagicAcceleration(leftDrvTrainAccelSetPt);
 		
 	}
 	
@@ -175,47 +102,49 @@ public class DriveBase {
 		return true;
 	}
 	
-	public void teleopInit(){
-
-		right1.changeControlMode(TalonControlMode.PercentVbus);
-		right1.set(0);
-		left1.changeControlMode(TalonControlMode.PercentVbus);	
-		left1.set(0);
-	}
-	
-	public void teleopPeriodic(){
-		double originalThrottle;
-		double originalTurn;
-		
-		switch (driver.GetDriveStyle()) {
-		case chessyStyle:
-			originalThrottle = throttleValue = driver.GetThrottle();
-			originalTurn = turnValue = driver.GetTurn();
-			
-			turnValue = CheckTurnSensitivityFilter(turnValue);
-			throttleValue = CheckThrottleSensitivity(throttleValue);
-			throttleValue = CheckSmoothMove(throttleValue);
-			AdjustForControllerDeadBand();
-			CheckForAdjustSpeedRequest();
-			AdjustForDriveLimits();
-			drive.arcadeDrive(throttleValue, turnValue, false);
-		}
-	}
-	
 	public double CheckTurnSensitivityFilter( double _turn) {
+		/*  Described in Drive Train Class Specification as
+		 *  Sensitivity High -- used on chessy turn control
+		 *  Apply a sin function that is scaled
+		 */
 		double fTurn = _turn;
-		
-		if (driver.GetTurnSensitivityEnabled()) {			
-			if (lowSpeedFactorEnabled) {
-			  fTurn = ApplySineFunction(fTurn);
-			  fTurn = ApplySineFunction(fTurn);
-			} else {
+
+		switch (driver.GetTurnSensitivity()) {
+			case High:
+			{		
+				if (lowSpeedFactorEnabled) {
+				  fTurn = ApplySineFunction(fTurn);
+				  fTurn = ApplySineFunction(fTurn);
+				} else {
 				  fTurn = ApplySineFunction(fTurn);
 				  fTurn = ApplySineFunction(fTurn);
 				  fTurn = ApplySineFunction(fTurn);				
+				}
 			}
+			break;
 			
+			case Sine:
+			{		
+				 if (_turn < 0) {
+				  fTurn = (2 * (Math.pow(_turn, 3))) - (3 * (Math.pow(_turn, 2)));
+			 	} else {
+				  fTurn = (3 * (Math.pow(_turn, 2))) - (2 * (Math.pow(_turn, 3))); 
+				 }
+			}
+			break;
+			
+			case Low:
+			{		
+				 fTurn = TeleConfig.kTurnSensitivityLowGain * (Math.pow(_turn, 3)) + 
+						 (1 - TeleConfig.kTurnSensitivityLowGain)*_turn;
+			}
+			break;
+			
+			default:
+			  break;
 		}
+				
+	
 		return fTurn;
 	}
 
@@ -224,7 +153,7 @@ public class DriveBase {
 		double fThrottle = _throttle;
 		int exp = 3;
 		
-		if (driver.GetThrottleSensitivityEnabled()) {			
+		if (driver.GetThrottleSensitivity() == DriverIF.ControllerSensitivity.High) {			
 			if (lowSpeedFactorEnabled) {
 				fThrottle = TeleConfig.kThrottleSensitivityLowGain*(Math.pow(fThrottle, exp)) +
 						(1 - TeleConfig.kThrottleSensitivityLowGain*fThrottle);
@@ -283,7 +212,7 @@ public class DriveBase {
 	}
 	
 	public double ApplySineFunction(double _turn) {
-		double factor = Math.PI/2.0 * TeleConfig.kTurnSensitivityGain;
+		double factor = Math.PI/2.0 * TeleConfig.kTurnSensitivityHighGain;
 		return Math.sin(factor * _turn)/Math.sin(factor);
 	}
 	
@@ -329,97 +258,6 @@ public class DriveBase {
 		  throttleValue *= TeleConfig.kLowMaxSpeedFactor;
 		  turnValue *= TeleConfig.kLowMaxSpeedFactor;
 		}	
-	}
-	
-	/*
-	* Test programs to calibrate the robot drive system
-	*/
-	/**
-	* driveTestMtrSquareWave method
-	* Team/Date/Author
-	* By pressing and holding a button(left/Right) on the joystick a
-	* square wave will be generated for PID tuning
-	*/
-    public void testInit() {  
-    	SmartDashboard.putNumber("runTest", 0);
-    }
-    
-    /**
-     * This function is called periodically during test mode
-     */
-    public void testPeriodic() {
-    	// some way to choose a test function 	
-    	short choice = (short)SmartDashboard.getNumber("runTest", 0);
-    	boolean newRequest =  (lastChoice != choice);
-    	lastChoice = choice;
-    	switch (choice) {
-    	  case 1: {
-    		  
- 
-    		  if (newRequest) {
-    		   System.out.println("start choice 1");
-    		  }
-    	  break;
-    	  }
-    	  
-    	  default: {
-    		  if (newRequest){
-       		   System.out.println("choice defaulted");
-       		  }
-    	  }
-    		   
-    	}
-    	
-    	     
-    }
-    
-	public void driveTestMtrSquareWave(int driveTrainSide) {
-		if (driver.GetSquareWaveEnabled()){
-			
-		    if (!squareWaveActive) {
-			  isActiveHighTime = true;
-			  squareWaveActive = true;
-			  squareStartTime = Timer.getFPGATimestamp();
-		    }
-		
-		  if (isActiveHighTime){
-			if (squareStartTime + SRXConfig.kSQWaveHighTime > Timer.getFPGATimestamp()) {
-				// time to switch to low 
-				squareStartTime = Timer.getFPGATimestamp();
-				isActiveHighTime = false;
-			}
-		  } else {
-				if (squareStartTime + SRXConfig.kSQWaveLowTime > Timer.getFPGATimestamp()) {
-					// time to switch to high
-					squareStartTime = Timer.getFPGATimestamp();
-					isActiveHighTime = true;
-				}  
-		  }
-		  
-		  if (isActiveHighTime) {
-			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
-				right1.set(SRXConfig.kRightSideHighSpeed);
-			} else {
-				left1.set(SRXConfig.kLeftSideHighSpeed);
-			}
-		  } else {
-			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
-				right1.set(SRXConfig.kRightSideLowSpeed);
-			} else {
-				left1.set(SRXConfig.kLeftSideLowSpeed);
-			}
-		  }
-	  } else {
-		  squareWaveActive = false;
-	  }
-	}
-	
-	public void driveTestJog(int motorID){
-		
-	}
-	
-	public void driveTestStraightIndex(int motorID){
-		
 	}
 	
 

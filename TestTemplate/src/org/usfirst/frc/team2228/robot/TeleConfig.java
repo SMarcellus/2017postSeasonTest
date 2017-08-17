@@ -6,7 +6,8 @@ public class TeleConfig {
 	
     public static final double kMaxDeltaVelocity = 0.2;
     public static final double kZeroSpeedDeadBand = 0.1;
-    public static final double kTurnSensitivityGain = 0.7;
+    public static final double kTurnSensitivityHighGain = 0.7;
+    public static final double kTurnSensitivityLowGain = 0.0;
     public static final double kThrottleSensitivityLowGain = 0.7;
     public static final double kThrottleSensitivityHighGain = 0.7;
     public static final double kLowMaxSpeedFactor = 0.7;

@@ -10,7 +10,7 @@ public interface DriverIF {
 	}
 
 
-	public enum JoystickSensitivity {
+	public enum ControllerSensitivity {
 		High,
 		Normal,
 		Sine,
@@ -43,8 +43,8 @@ public interface DriverIF {
 	public abstract boolean QuickTurnLeft();
 	public abstract boolean QuickTurnRight();
 	
-	public abstract boolean GetTurnSensitivityEnabled();
-	public abstract boolean GetThrottleSensitivityEnabled();
+	public abstract ControllerSensitivity GetTurnSensitivity();
+	public abstract ControllerSensitivity GetThrottleSensitivity();
 	public abstract boolean GetSmoothMoveEnabled();
 	public abstract boolean GetLowSpeedTriggered();
 	public abstract boolean GetHighSpeedTriggered();

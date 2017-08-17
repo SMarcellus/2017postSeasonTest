@@ -1,6 +1,12 @@
 package org.usfirst.frc.team2228.robot;
 
+import edu.wpi.first.wpilibj.Joystick;
+
 public class SimDriver implements DriverIF {
+	
+	public SimDriver() {
+		
+	}
 
 	@Override
 	public DriveStyle GetDriveStyle() {
@@ -63,15 +69,15 @@ public class SimDriver implements DriverIF {
 	}
 
 	@Override
-	public boolean GetTurnSensitivityEnabled() {
+	public ControllerSensitivity GetTurnSensitivity() {
 		// TODO Auto-generated method stub
-		return false;
+		return DriverIF.ControllerSensitivity.High;
 	}
 
 	@Override
-	public boolean GetThrottleSensitivityEnabled() {
+	public ControllerSensitivity GetThrottleSensitivity() {
 		// TODO Auto-generated method stub
-		return false;
+		return DriverIF.ControllerSensitivity.High;
 	}
 
 	@Override
