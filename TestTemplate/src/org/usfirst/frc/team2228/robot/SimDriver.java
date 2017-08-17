@@ -4,104 +4,108 @@ import edu.wpi.first.wpilibj.Joystick;
 
 public class SimDriver implements DriverIF {
 	
+	// test program can write to these directly for testing
+	public DriverIF.DriveStyle myStyle = DriverIF.DriveStyle.chessyStyle;
+	
+	public double leftX = 0;
+	public double righttX = 0;
+	public double throttle = 0;
+	public double turn = 0;
+	public double getX = 0;
+	public double getY = 0;
+	public double getTwist = 0;
+	
+	public boolean quickTurnLeft = false;
+	public boolean quickTurnRight = false;
+	public DriverIF.ControllerSensitivity turnSensitivity = DriverIF.ControllerSensitivity.Normal;
+	public DriverIF.ControllerSensitivity throttleSensitivity = DriverIF.ControllerSensitivity.Normal;
+	public boolean  smoothMoveOn = false;
+	public boolean  lowSpeedTriggered = false;
+	public boolean  highSpeedTriggered = false;
+	public boolean  squareWaveEnabled = false;
+	
 	public SimDriver() {
 		
 	}
 
 	@Override
 	public DriveStyle GetDriveStyle() {
-		// TODO Auto-generated method stub
-		return null;
+		return myStyle;
 	}
 
 	@Override
 	public double GetLeftX() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getX;
 	}
 
 	@Override
 	public double GetRightX() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getY;
 	}
 
 	@Override
 	public double GetThrottle() {
-		// TODO Auto-generated method stub
-		return 0;
+		return throttle;
 	}
 
 	@Override
 	public double GetTurn() {
-		// TODO Auto-generated method stub
-		return 0;
+		return turn;
 	}
 
 	@Override
 	public double GetX() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getX;
 	}
 
 	@Override
 	public double GetY() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getY;
 	}
 
 	@Override
 	public double GetTwist() {
-		// TODO Auto-generated method stub
-		return 0;
+		return getTwist;
 	}
 
 	@Override
 	public boolean QuickTurnLeft() {
-		// TODO Auto-generated method stub
-		return false;
+		return quickTurnLeft;
 	}
 
 	@Override
 	public boolean QuickTurnRight() {
-		// TODO Auto-generated method stub
-		return false;
+		return quickTurnRight;
 	}
 
 	@Override
 	public ControllerSensitivity GetTurnSensitivity() {
-		// TODO Auto-generated method stub
-		return DriverIF.ControllerSensitivity.High;
+		return turnSensitivity;
 	}
 
 	@Override
 	public ControllerSensitivity GetThrottleSensitivity() {
-		// TODO Auto-generated method stub
-		return DriverIF.ControllerSensitivity.High;
+		return throttleSensitivity;
 	}
 
 	@Override
 	public boolean GetSmoothMoveEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return smoothMoveOn;
 	}
 
 	@Override
 	public boolean GetLowSpeedTriggered() {
-		// TODO Auto-generated method stub
-		return false;
+		return lowSpeedTriggered;
 	}
 
 	@Override
 	public boolean GetHighSpeedTriggered() {
-		// TODO Auto-generated method stub
-		return false;
+		return highSpeedTriggered;
 	}
 
 	@Override
 	public boolean GetSquareWaveEnabled() {
-		// TODO Auto-generated method stub
-		return false;
+		return squareWaveEnabled;
 	}
 
 }
