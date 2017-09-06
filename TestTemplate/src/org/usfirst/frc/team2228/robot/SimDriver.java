@@ -88,6 +88,15 @@ public class SimDriver implements DriverIF {
 		return throttleSensitivity;
 	}
 
+	
+	public boolean GetTurnSensitivityEnabled() {
+		return false;
+	}
+	
+	public boolean GetThrottleSensitivityEnabled() {
+		return  false;
+	}
+	
 	@Override
 	public boolean GetSmoothMoveEnabled() {
 		return smoothMoveOn;

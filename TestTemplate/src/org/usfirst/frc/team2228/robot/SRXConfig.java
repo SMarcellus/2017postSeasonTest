@@ -11,32 +11,38 @@ public class SRXConfig {
 		public static int LEFT_ONE_DRIVE = 3;
 		public static int LEFT_TWO_DRIVE = 4;
 		
-		public static boolean rightEncoderEnabled = true;
-		public static FeedbackDevice rightFeedback = FeedbackDevice.QuadEncoder;
+		public static boolean RIGHT_ENCODER_ENABLED = true;
+		public static FeedbackDevice RIGHT_FEEDBACK = FeedbackDevice.QuadEncoder;
 		
-		public static boolean leftEncoderEnabled = true;
-		public static FeedbackDevice leftFeedback = FeedbackDevice.QuadEncoder;
+		public static boolean LEFT_ENCODER_ENABLED = true;
+		public static FeedbackDevice LEFT_FEEDBACK = FeedbackDevice.QuadEncoder;
 		
-		public static TalonControlMode right1Mode = TalonControlMode.PercentVbus;
-		public static TalonControlMode right2Mode = TalonControlMode.Follower;
-		public static TalonControlMode left1Mode = TalonControlMode.PercentVbus;
-		public static TalonControlMode left2Mode = TalonControlMode.Follower;
+		public static TalonControlMode RIGHT_1_MODE = TalonControlMode.PercentVbus;
+		public static TalonControlMode RIGHT_2_MODE = TalonControlMode.Follower;
+		public static TalonControlMode LEFT_1_MODE = TalonControlMode.PercentVbus;
+		public static TalonControlMode LEFT_2_MODE = TalonControlMode.Follower;
 		
-		public static boolean brakeModeEnabled = false;
+		public static boolean BRAKE_MODE_ENABLED = false;
 		
 		// closed loop parameters
 		// Proportional, Integration, Differential, Feedfoward
 		// ramp rate is maximum change in voltage volts/sec
 		public static int default_profile = 0;
-		public static double rightP = 0.2;
-		public static double rightI = 0;
-		public static double rightD = 0;
-		public static double rightFF = 0;
+		public static double RIGHT_P = 0.2;
+		public static double RIGHT_I = 0;
+		public static double RIGHT_D = 0;
+		public static double RIGHT_FF = 0;
+		public static int RGT_IZONE_COUNTS = 50;
+		
 		//public static double closeLoopRampRate = 0;
-		public static double leftP = 0.2;
-		public static double leftI = 0;
-		public static double leftD = 0;
-		public static double leftFF = 0;
+		public static double LEFT_P = 0.2;
+		public static double LEFT_I = 0;
+		public static double LEFT_D = 0;
+		public static double LEFT_FF = 0;
+		public static int LFT_IZONE_COUNTS = 50;
+		
+		public static int RGT_ALLOWABLE_CLOSELOOP_ERR = 200;
+		public static int LFT_ALLOWABLE_CLOSELOOP_ERR = 200;
 		
 		// CTRE CIMCoder magnetic quadrature (4) encoder 20 pulse per turn
 		//  AndyMark tough box mini 14:50 to 16:48 
@@ -49,11 +55,11 @@ public class SRXConfig {
 		public static final double COUNTS_INCH = COUNTS_PER_REV / (WHEEL_DIAMETER * Math.PI);
 		
 		//testing and calibration
-		public static final double kRightSideHighSpeed = 0.75;
-		public static final double kLeftSideHighSpeed = 0.75;
-		public static final double kRightSideLowSpeed = 0.25;
-		public static final double kLeftSideLowSpeed = 0.25;
-		public static final double kSQWaveHighTime = 500.0;
-		public static final double kSQWaveLowTime = 500.0;
+		public static final double K_RIGHT_HIGH_SPEED = 0.75;
+		public static final double K_LEFT_HIGH_SPEED = 0.75;
+		public static final double K_RIGHT_LOW_SPEED = 0.25;
+		public static final double K_LEFT_LOW_SPEED = 0.25;
+		public static final double K_SQ_WAVE_HIGH_TIME = 500.0;
+		public static final double K_SQ_WAVE_LOW_TIME = 500.0;
 }
 	

@@ -31,26 +31,26 @@ public class SRXDriveBase extends DriveBase {
 		left1 = new CANTalon(SRXConfig.LEFT_ONE_DRIVE);  // master
 		left2 = new CANTalon(SRXConfig.LEFT_TWO_DRIVE);
 		
-		if (SRXConfig.rightEncoderEnabled)
+		if (SRXConfig.RIGHT_ENCODER_ENABLED)
 		{
-			right1.setFeedbackDevice(SRXConfig.rightFeedback);
+			right1.setFeedbackDevice(SRXConfig.RIGHT_FEEDBACK);
 		}
 		
-		if (SRXConfig.leftEncoderEnabled)
+		if (SRXConfig.LEFT_ENCODER_ENABLED)
 		{
-			left1.setFeedbackDevice(SRXConfig.leftFeedback);
+			left1.setFeedbackDevice(SRXConfig.LEFT_FEEDBACK);
 		}
 		
-		right1.changeControlMode(SRXConfig.right1Mode);
-		right2.changeControlMode(SRXConfig.right2Mode);
-		if (SRXConfig.right2Mode == TalonControlMode.Follower) {
+		right1.changeControlMode(SRXConfig.RIGHT_1_MODE);
+		right2.changeControlMode(SRXConfig.RIGHT_2_MODE);
+		if (SRXConfig.RIGHT_2_MODE == TalonControlMode.Follower) {
 			right2.set(right1.getDeviceID());
 			right2.enableControl();
 		}
 			
-		left1.changeControlMode(SRXConfig.left1Mode);
-		left2.changeControlMode(SRXConfig.left2Mode);
-		if (SRXConfig.left2Mode == TalonControlMode.Follower) {
+		left1.changeControlMode(SRXConfig.LEFT_1_MODE);
+		left2.changeControlMode(SRXConfig.LEFT_2_MODE);
+		if (SRXConfig.LEFT_2_MODE == TalonControlMode.Follower) {
 			left2.set(left1.getDeviceID());
 			left2.enableControl();
 		}		
@@ -68,10 +68,10 @@ public class SRXDriveBase extends DriveBase {
 		left2.configPeakOutputVoltage(+12.0f, -12.0f);
 		
 		// Disable brake mode in all drive motors, motors will coast to a stop
-		right1.enableBrakeMode(SRXConfig.brakeModeEnabled);
-		right2.enableBrakeMode(SRXConfig.brakeModeEnabled);
-		left1.enableBrakeMode(SRXConfig.brakeModeEnabled);
-		left2.enableBrakeMode(SRXConfig.brakeModeEnabled);
+		right1.enableBrakeMode(SRXConfig.BRAKE_MODE_ENABLED);
+		right2.enableBrakeMode(SRXConfig.BRAKE_MODE_ENABLED);
+		left1.enableBrakeMode(SRXConfig.BRAKE_MODE_ENABLED);
+		left2.enableBrakeMode(SRXConfig.BRAKE_MODE_ENABLED);
 	}
 
 
@@ -110,8 +110,9 @@ public class SRXDriveBase extends DriveBase {
 		
 		switch (driver.GetDriveStyle()) {
 		case chessyStyle: {
-		//	originalThrottle = throttleValue = driver.GetThrottle();
-		//	originalTurn = turnValue = driver.GetTurn();
+			// retrieve the requested input from the driver
+			throttleValue = driver.GetThrottle();
+	    	turnValue = driver.GetTurn();
 			
 			turnValue = CheckTurnSensitivityFilter(turnValue);
 			throttleValue = CheckThrottleSensitivity(throttleValue);
@@ -178,13 +179,13 @@ public class SRXDriveBase extends DriveBase {
     		    }
     		
     		  if (isActiveHighTime){
-    			if (squareStartTime + SRXConfig.kSQWaveHighTime > Timer.getFPGATimestamp()) {
+    			if (squareStartTime + SRXConfig.K_SQ_WAVE_HIGH_TIME > Timer.getFPGATimestamp()) {
     				// time to switch to low 
     				squareStartTime = Timer.getFPGATimestamp();
     				isActiveHighTime = false;
     			}
     		  } else {
-    				if (squareStartTime + SRXConfig.kSQWaveLowTime > Timer.getFPGATimestamp()) {
+    				if (squareStartTime + SRXConfig.K_SQ_WAVE_LOW_TIME > Timer.getFPGATimestamp()) {
     					// time to switch to high
     					squareStartTime = Timer.getFPGATimestamp();
     					isActiveHighTime = true;
@@ -193,15 +194,15 @@ public class SRXDriveBase extends DriveBase {
     		  
     		  if (isActiveHighTime) {
     			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
-    				right1.set(SRXConfig.kRightSideHighSpeed);
+    				right1.set(SRXConfig.K_RIGHT_HIGH_SPEED);
     			} else {
-    				left1.set(SRXConfig.kLeftSideHighSpeed);
+    				left1.set(SRXConfig.K_LEFT_HIGH_SPEED);
     			}
     		  } else {
     			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
-    				right1.set(SRXConfig.kRightSideLowSpeed);
+    				right1.set(SRXConfig.K_RIGHT_LOW_SPEED);
     			} else {
-    				left1.set(SRXConfig.kLeftSideLowSpeed);
+    				left1.set(SRXConfig.K_LEFT_LOW_SPEED);
     			}
     		  }
     	  } else {

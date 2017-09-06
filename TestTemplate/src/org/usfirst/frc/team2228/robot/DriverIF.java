@@ -45,6 +45,8 @@ public interface DriverIF {
 	
 	public abstract ControllerSensitivity GetTurnSensitivity();
 	public abstract ControllerSensitivity GetThrottleSensitivity();
+	public abstract boolean GetTurnSensitivityEnabled();
+	public abstract boolean GetThrottleSensitivityEnabled();
 	public abstract boolean GetSmoothMoveEnabled();
 	public abstract boolean GetLowSpeedTriggered();
 	public abstract boolean GetHighSpeedTriggered();

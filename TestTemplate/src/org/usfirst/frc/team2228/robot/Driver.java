@@ -76,6 +76,14 @@ public class Driver implements DriverIF {
 		return  DriverConfig.sensitivity;
 	}
 	
+	public boolean GetTurnSensitivityEnabled() {
+		return false;
+	}
+	
+	public boolean GetThrottleSensitivityEnabled() {
+		return  false;
+	}
+	
 	public boolean GetSmoothMoveEnabled() {
 		return true;
 	}

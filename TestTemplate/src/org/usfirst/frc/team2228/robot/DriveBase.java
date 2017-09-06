@@ -1,6 +1,8 @@
 package org.usfirst.frc.team2228.robot;
 
 
+import org.usfirst.frc.team2228.robot.DriverIF.ControllerSensitivity;
+
 import edu.wpi.first.wpilibj.AnalogGyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.SPI;
@@ -108,43 +110,16 @@ public class DriveBase {
 		 *  Apply a sin function that is scaled
 		 */
 		double fTurn = _turn;
-
-		switch (driver.GetTurnSensitivity()) {
-			case High:
-			{		
-				if (lowSpeedFactorEnabled) {
-				  fTurn = ApplySineFunction(fTurn);
-				  fTurn = ApplySineFunction(fTurn);
-				} else {
-				  fTurn = ApplySineFunction(fTurn);
-				  fTurn = ApplySineFunction(fTurn);
-				  fTurn = ApplySineFunction(fTurn);				
-				}
-			}
-			break;
-			
-			case Sine:
-			{		
-				 if (_turn < 0) {
-				  fTurn = (2 * (Math.pow(_turn, 3))) - (3 * (Math.pow(_turn, 2)));
-			 	} else {
-				  fTurn = (3 * (Math.pow(_turn, 2))) - (2 * (Math.pow(_turn, 3))); 
-				 }
-			}
-			break;
-			
-			case Low:
-			{		
-				 fTurn = TeleConfig.kTurnSensitivityLowGain * (Math.pow(_turn, 3)) + 
-						 (1 - TeleConfig.kTurnSensitivityLowGain)*_turn;
-			}
-			break;
-			
-			default:
-			  break;
+		if (driver.GetTurnSensitivityEnabled()) {
+	     if (lowSpeedFactorEnabled) {
+		   fTurn = ApplySineFunction(fTurn);
+		   fTurn = ApplySineFunction(fTurn);
+		   } else {
+		   fTurn = ApplySineFunction(fTurn);
+		   fTurn = ApplySineFunction(fTurn);
+		   fTurn = ApplySineFunction(fTurn);				
+		  }
 		}
-				
-	
 		return fTurn;
 	}
 
@@ -153,7 +128,10 @@ public class DriveBase {
 		double fThrottle = _throttle;
 		int exp = 3;
 		
-		if (driver.GetThrottleSensitivity() == DriverIF.ControllerSensitivity.High) {			
+		//  I don't have this one right yet...
+		
+
+		if (driver.GetThrottleSensitivityEnabled()) {			
 			if (lowSpeedFactorEnabled) {
 				fThrottle = TeleConfig.kThrottleSensitivityLowGain*(Math.pow(fThrottle, exp)) +
 						(1 - TeleConfig.kThrottleSensitivityLowGain*fThrottle);
@@ -163,31 +141,40 @@ public class DriveBase {
 			}
 			
 		}
+		
 		return fThrottle;
 	}
 	
 
 
-
-	// This calculates the value of the joystick speed after going through the
-	// tipping filter
+	/** 
+	* TippingFilter aka SmoothMove
+	* The tipping filter follows the actions of the driver with respect
+	* to the motion of the throttle joystick. If the driver exceeds the 
+	* limit of robot accel/decel capability, the tipping filter slows the 
+	* response of the throttle to protect the robot. If the filter is activated,
+	* it will return to driver control as soon as the driver is controlling
+	* within robot limits. Determination of kMaxDeltaVelocity is determined by testing.
+	* @param value, is the value of the throttle joystick 
+	*/
 	public double CheckSmoothMove( double _throttle) {
 		double fThrottle = _throttle;
 		double deltaValue = 0;
 		int smoothFactor = 0;
 		
 		if (driver.GetSmoothMoveEnabled()) {
+			// check if the requested throttle is going in the same previous direction
 			if (Math.signum(fThrottle) == Math.signum(previousEMAValue)) {
 				deltaValue = fThrottle - previousEMAValue;				
-				// prevent tipping if delta is too big
-				if (Math.abs(deltaValue) > TeleConfig.kMaxDeltaVelocity) {
-					smoothFactor = TeleConfig.kHighSmooth;
+				// prevent tipping if delta is too big apply a larger limit
+				if (Math.abs(deltaValue) > TeleConfig.MAX_DELTA_VELOCITY) {
+					smoothFactor = TeleConfig.HIGH_SMOOTH;
 				} else {
-					smoothFactor = TeleConfig.kLowSmooth;
+					smoothFactor = TeleConfig.LOW_SMOOTH;
 				}			
 			} else { // driver has switched directions, we're tipping!
 				fThrottle = 0;
-				smoothFactor = TeleConfig.kHighSmooth;
+				smoothFactor = TeleConfig.HIGH_SMOOTH;
 			}
 			/*
 			* Exponential Moving Average Filter (EMA) is a recursive low pass filter
@@ -202,8 +189,8 @@ public class DriveBase {
 			
 			// If we are within the zero speed dead band set the gain for a high
 			// response filter(low smoothing) and set the speed to zero
-			if (Math.abs(previousEMAValue) < TeleConfig.kZeroSpeedDeadBand) {
-			  smoothFactor = TeleConfig.kLowSmooth;
+			if (Math.abs(previousEMAValue) < TeleConfig.ZERO_DEAD_BAND) {
+			  smoothFactor = TeleConfig.LOW_SMOOTH;
 			  fThrottle = 0;
 			}
 			previousEMAValue = fThrottle;
@@ -216,6 +203,10 @@ public class DriveBase {
 		return Math.sin(factor * _turn)/Math.sin(factor);
 	}
 	
+	/*
+	 *  Prevent reaction to very small movements to the joystick
+	 *  "deadband" usually set to 0.1 as an input 
+	 */
 	public void AdjustForControllerDeadBand() {
 		if (Math.abs(throttleValue) < TeleConfig.JOY_STICK_DEADBAND) {
 			throttleValue = 0;
@@ -226,6 +217,9 @@ public class DriveBase {
 	
 	}
 	
+	/*
+	 * 
+	 */
 	public void AdjustForDriveLimits() {
 		if (Math.abs(throttleValue) > 1.0) {
 			throttleValue = Math.signum(throttleValue)*1;
@@ -236,10 +230,10 @@ public class DriveBase {
 	
 	}
 	
+	/*
+	* Check for low max speed operation and limit speed by low speed factor
+	*/	
 	public void CheckForAdjustSpeedRequest() {
-		/*
-		* Check for low max speed operation and limit speed by low speed factor
-		*/
 		boolean currentLowSpeedTriggered = driver.GetLowSpeedTriggered();
 		
 		if (currentLowSpeedTriggered && !lowSpeedTriggered  // this is a change
