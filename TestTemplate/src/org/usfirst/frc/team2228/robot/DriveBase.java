@@ -1,6 +1,10 @@
 package org.usfirst.frc.team2228.robot;
 
 
+import java.io.File;
+import java.net.URISyntaxException;
+import java.util.Date;
+
 import org.usfirst.frc.team2228.robot.DriverIF.ControllerSensitivity;
 
 import edu.wpi.first.wpilibj.AnalogGyro;
@@ -57,13 +61,23 @@ public class DriveBase {
 	protected double kLftDistanceCalibration = 0;  // ?
 	protected double kInchesPerCount = (SRXConfig.WHEEL_DIAMETER * Math.PI)/SRXConfig.COUNTS_PER_REV;
 
-	
+	public Date buildDate;
 	
 
 	// Constructor
 	public DriveBase(DriverIF _driver)
 	{
       driver = _driver;
+      
+      // keep its build date for reference
+      try {
+		buildDate = new Date(
+			new File(getClass().getClassLoader().getResource(
+				getClass().getCanonicalName().replace('.', '/')+".class").toURI()).lastModified());
+	  } catch (URISyntaxException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	  }
 	}
 	
 	public DriveBase() {

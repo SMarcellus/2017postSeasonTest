@@ -21,13 +21,41 @@ public class TestMain {
 		}
 		System.out.println("********************");
 	}
+	
+	//  CHESTER THIS TEST IS FOR YOU!!!!!
+	public static void TestFloatVsDouble(){
+		double dMultiplier = 7/6;                  // BAD divides then casts to float
+		System.out.println(dMultiplier + " vs. ");
+		float ftop = 7;
+		float fbottom = 6;
+		dMultiplier = ftop/ftop;                  // BAD
+		System.out.println(dMultiplier + " vs. ");
+		int itop = 7;
+		int ibottom = 6;
+		dMultiplier = itop/ibottom;                  // BAD
+		System.out.println(dMultiplier + " vs. ");
+		double dtop = 7;
+		double dbottom = 6;
+		dMultiplier = dtop/dbottom;                 // GOOD knows its dividing doubles
+		System.out.println(dMultiplier + " vs. ");
+		dMultiplier = (double)7/(double)6;          // GOOD knows its dividing doubles
+		System.out.println(dMultiplier + " vs. ");
+		dMultiplier = 7.0/6.0;                      // GOOD knows its dividing doubles
+		System.out.println(dMultiplier);
+	}
 
 	public static void main(String[] args){
 	    driver = new SimDriver();
         driveBase = new DriveBase((DriverIF)driver);
+        System.out.println(driveBase.buildDate);
+        
+        TestFloatVsDouble();
+        
+        /*
         TestTurnSensitivity(DriverIF.ControllerSensitivity.High);
         TestTurnSensitivity(DriverIF.ControllerSensitivity.Normal);
         TestTurnSensitivity(DriverIF.ControllerSensitivity.Sine);
         TestTurnSensitivity(DriverIF.ControllerSensitivity.Low);
+        */
 	}
 }
