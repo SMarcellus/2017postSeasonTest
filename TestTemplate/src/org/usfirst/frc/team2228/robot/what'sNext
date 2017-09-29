@@ -4,6 +4,7 @@
  - add comments/descriptions of what's there
  - add logging and debug information
  - separate autonomous programming
+ - enabled generic button trigger function
  - need test for
     - drive short distance by encoder count (open loop)
     - drive distance by setPosition (closed loop)

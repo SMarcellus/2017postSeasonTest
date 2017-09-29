@@ -34,6 +34,8 @@ public class Robot extends IterativeRobot {
         SmartDashboard.putData("Auto choices", chooser);
 
         // put axis and button mapping in DriverConfig
+
+		DebugLogger.init("/home/lvuser/log/Debug");
 		joystick = new Joystick(1/*RobotMap.RIGHT_SIDE_JOYSTICK_ONE*/);
 		driver = new Driver(joystick);
 		// generic drive base

@@ -19,7 +19,7 @@ public class SimDriver implements DriverIF {
 	public boolean quickTurnRight = false;
 	public DriverIF.ControllerSensitivity turnSensitivity = DriverIF.ControllerSensitivity.Normal;
 	public DriverIF.ControllerSensitivity throttleSensitivity = DriverIF.ControllerSensitivity.Normal;
-	public boolean  smoothMoveOn = false;
+	public boolean  smoothMoveOn = true;
 	public boolean  lowSpeedTriggered = false;
 	public boolean  highSpeedTriggered = false;
 	public boolean  squareWaveEnabled = false;

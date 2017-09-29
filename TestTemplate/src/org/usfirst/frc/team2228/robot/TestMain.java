@@ -1,6 +1,5 @@
 package org.usfirst.frc.team2228.robot;
 
-
 public class TestMain {
 	public static SimDriver driver;
 	public static DriveBase driveBase;
@@ -18,6 +17,66 @@ public class TestMain {
 		for (int i = 0;  i < size; i++){
 			output = driveBase.CheckTurnSensitivityFilter(input[i]);
 			System.out.println(input[i] + "-->" + output);
+		}
+		System.out.println("********************");
+	}
+	
+	public static void TestSmoothMove(){
+		
+		System.out.println("******** CHECK SMOOTH MOVE ************");
+		double [] input = {0.0, -0.2 ,-0.4, -0.6, -0.8,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
+				 0, 0, 0, 0 
+		};
+		double output = 0.0;
+		driveBase.previousEMAValue = 0.0;
+		int size = input.length;
+		for (int i = 0;  i < size; i++){
+			output = driveBase.CheckSmoothMove(input[i]);
+			System.out.println(input[i] + "-->" + output);
+			DebugLogger.log(input[i] + " smooth " + output);
+		}
+		System.out.println("********************");
+	}
+	
+	public static void TestTippingFilterMove(){
+		
+		System.out.println("******** CHECK TIPPING FILTER  ************");
+		double [] input = {0.0, -0.2 ,-0.4, -0.6, -0.8,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				-1.0, -1.0, -1.0, -1.0, -1.0, -1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
+				 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 
+				 0, 0, 0, 0 
+		};
+		double output = 0.0;
+		driveBase.previousEMAValue = 0.0;
+		int size = input.length;
+		for (int i = 0;  i < size; i++){
+			output = driveBase.CheckTippingFilter(input[i]);
+			System.out.println(input[i] + "-->" + output);
+			DebugLogger.log(input[i] + " tipping " + output);
 		}
 		System.out.println("********************");
 	}
@@ -45,13 +104,17 @@ public class TestMain {
 	}
 
 	public static void main(String[] args){
+		DebugLogger.init("C:/temp/test/Debug_");
 	    driver = new SimDriver();
         driveBase = new DriveBase((DriverIF)driver);
         System.out.println(driveBase.buildDate);
         
-        TestFloatVsDouble();
+        TestSmoothMove();
+        TestTippingFilterMove();
         
         /*
+         *  
+        TestFloatVsDouble();
         TestTurnSensitivity(DriverIF.ControllerSensitivity.High);
         TestTurnSensitivity(DriverIF.ControllerSensitivity.Normal);
         TestTurnSensitivity(DriverIF.ControllerSensitivity.Sine);

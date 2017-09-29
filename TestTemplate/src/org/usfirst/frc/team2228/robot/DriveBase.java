@@ -7,14 +7,6 @@ import java.util.Date;
 
 import org.usfirst.frc.team2228.robot.DriverIF.ControllerSensitivity;
 
-import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.SPI;
-import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.interfaces.Accelerometer;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveBase {
 	protected DriverIF driver;
@@ -42,7 +34,8 @@ public class DriveBase {
 	protected boolean highSpeedTriggered = false;
 	
 	// smooth move parameters
-	private double previousEMAValue = 0; // -1 to 1
+	public double previousEMAValue = 0.0; // -1 to 1
+	public int timePeriodSF =  TeleConfig.HIGH_SMOOTH;
 	
 	// auto parameters
 	protected double autoIndexDistance = 0;
@@ -173,22 +166,24 @@ public class DriveBase {
 	*/
 	public double CheckSmoothMove( double _throttle) {
 		double fThrottle = _throttle;
-		double deltaValue = 0;
-		int smoothFactor = 0;
+		double deltaValue = fThrottle - previousEMAValue;
+		int timePeriodSF = 0;
 		
 		if (driver.GetSmoothMoveEnabled()) {
 			// check if the requested throttle is going in the same previous direction
 			if (Math.signum(fThrottle) == Math.signum(previousEMAValue)) {
-				deltaValue = fThrottle - previousEMAValue;				
+							
 				// prevent tipping if delta is too big apply a larger limit
 				if (Math.abs(deltaValue) > TeleConfig.MAX_DELTA_VELOCITY) {
-					smoothFactor = TeleConfig.HIGH_SMOOTH;
+					timePeriodSF = TeleConfig.HIGH_SMOOTH;
+					System.out.println("delta value >" + TeleConfig.MAX_DELTA_VELOCITY);
 				} else {
-					smoothFactor = TeleConfig.LOW_SMOOTH;
+					timePeriodSF = TeleConfig.LOW_SMOOTH;
 				}			
 			} else { // driver has switched directions, we're tipping!
 				fThrottle = 0;
-				smoothFactor = TeleConfig.HIGH_SMOOTH;
+				timePeriodSF = TeleConfig.HIGH_SMOOTH;
+				System.out.println("tipping?");
 			}
 			/*
 			* Exponential Moving Average Filter (EMA) is a recursive low pass filter
@@ -199,18 +194,99 @@ public class DriveBase {
 			* decides on approx number of cycles(timePeriodSF) for output = input. 
 			* Time period on iterative robot is approx 20ms
 			*/
-			fThrottle = previousEMAValue + (1-smoothFactor) * (deltaValue);
+			double smoothFactor = 2.0 / (timePeriodSF + 1);
+			fThrottle = previousEMAValue + (smoothFactor) * (deltaValue);
+			previousEMAValue = fThrottle;
 			
 			// If we are within the zero speed dead band set the gain for a high
-			// response filter(low smoothing) and set the speed to zero
+			// response filter(low smoothing) and set the speed to zero <-- ?
 			if (Math.abs(previousEMAValue) < TeleConfig.ZERO_DEAD_BAND) {
-			  smoothFactor = TeleConfig.LOW_SMOOTH;
-			  fThrottle = 0;
+		      timePeriodSF = TeleConfig.LOW_SMOOTH;
+		      System.out.println("previousEMA" + previousEMAValue + "<" + TeleConfig.ZERO_DEAD_BAND);
 			}
-			previousEMAValue = fThrottle;
+			
 		}
 		return fThrottle;
 	}
+	/** 
+	* TippingFilter
+	* Team/Date/Author:
+	* The tipping filter follows the actions of the driver with respect
+	* to the motion of the throtle joystick. If the driver exceeds the 
+	* limit of robot accel/decel capability the tipping filter slows the 
+	* response of the throtle to protect the robot. 
+	*
+	* There are four changes in value from the last joystick value:
+	* 1) Transistion from one side of zero to the other side of zero
+	* 2) The positive side of zero
+	* 3) The negative side of zero
+	* 4) Within the joystick deadband
+	*
+	* Determination of kMaxDeltaVel is determined by testing.
+	*
+	* @parm _value, is the value of the throtle joystick 
+	*/
+	public double CheckTippingFilter(double _value) {
+		double value = _value;
+		// determine change for last joystick read
+		double deltaValue = value - previousEMAValue;
+		double smoothFactor = 1.0;
+		
+		// Check joystick value transition from one side of zero to the other side of zero
+		if (Math.signum(value) != Math.signum(previousEMAValue)){
+			
+			// If joystick change is large enough to cause a wheelie or cause the
+			// robot to start to tip - the robot intervenes to see that this does
+			// not occur The following limits the change in joystick movement
+			if (Math.abs(deltaValue) > TeleConfig.MAX_DELTA_VELOCITY){
+				smoothFactor = TeleConfig.HIGH_SMOOTH;
+			} else {	
+			
+				// If driver behaves
+				smoothFactor = TeleConfig.LOW_SMOOTH;
+			}
+		}
+		
+		// Determine if the sign of value and oldEMA are the same
+		else if (Math.signum(value) == Math.signum(previousEMAValue)){
+				
+				// If joystick change is large enough to cause a wheelie or cause the
+				// robot to start to tip - the robot intervenes to see that this does
+				// not occur The following limits the change in joystick movement
+				if (Math.abs(deltaValue) > TeleConfig.MAX_DELTA_VELOCITY){
+					smoothFactor = TeleConfig.HIGH_SMOOTH;
+				} else {	
+				
+					// If driver behaves
+					smoothFactor = TeleConfig.LOW_SMOOTH;
+				}
+		}
+		
+		// Check if the smoothing filter is within the joystick deadband and put filter in high response gain
+		else if (Math.abs(previousEMAValue) < TeleConfig.ZERO_DEAD_BAND) {
+			deltaValue = 0;
+			previousEMAValue = 0;
+			smoothFactor = TeleConfig.LOW_SMOOTH;
+		} 
+		
+		// Run through smoothing filter	
+		/* 
+		*Expoential Avg Filter (EMA) is a recursive low pass filter that
+		* can change it's gain to address filter response
+		* 
+		* Range of smoothFactor is 0 to 1; where smoothFactor = 0 (no smoothing)
+		* smoothFactor = .99999 high smoothing
+		* Typical smoothFactor = 1-(2.0 / (timePeriodSF + 1)) where user decides
+		* on aprox number of cycles for output = input. Time period on
+		* iterative robot class is aprox 20ms
+		*/
+		// This is the value of the joystick speed after going through the
+		// tipping filter
+		value = previousEMAValue + (1-smoothFactor) * (deltaValue);
+		previousEMAValue = value;
+		return value;
+	}
+	
 	
 	public double ApplySineFunction(double _turn) {
 		double factor = Math.PI/2.0 * TeleConfig.kTurnSensitivityHighGain;
