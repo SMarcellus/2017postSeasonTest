@@ -11,10 +11,10 @@ public interface DriverIF {
 
 
 	public enum ControllerSensitivity {
-		High,
-		Normal,
+		Linear,
 		Sine,
-		Low
+		Squared,
+		Cubed
 	}
 	 /**
 	   * return the DriveStyle from the Driver config

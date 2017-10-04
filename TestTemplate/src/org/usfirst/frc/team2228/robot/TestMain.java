@@ -46,7 +46,7 @@ public class TestMain {
 		for (int i = 0;  i < size; i++){
 			output = driveBase.CheckSmoothMove(input[i]);
 			System.out.println(input[i] + "-->" + output);
-			DebugLogger.log(input[i] + " smooth " + output);
+			DebugLogger.log(i + ": " + input[i] + " smooth " + output);
 		}
 		System.out.println("********************");
 	}
@@ -76,7 +76,7 @@ public class TestMain {
 		for (int i = 0;  i < size; i++){
 			output = driveBase.CheckTippingFilter(input[i]);
 			System.out.println(input[i] + "-->" + output);
-			DebugLogger.log(input[i] + " tipping " + output);
+			DebugLogger.log(i + ": " + input[i] + " tipping " + output);
 		}
 		System.out.println("********************");
 	}

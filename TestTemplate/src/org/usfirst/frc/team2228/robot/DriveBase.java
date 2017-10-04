@@ -35,7 +35,9 @@ public class DriveBase {
 	
 	// smooth move parameters
 	public double previousEMAValue = 0.0; // -1 to 1
-	public int timePeriodSF =  TeleConfig.HIGH_SMOOTH;
+	public int timePeriodSF =  TeleConfig.kHighSmoothPeriod;
+	// tipping filter
+	protected double smoothFactor = 1.0;
 	
 	// auto parameters
 	protected double autoIndexDistance = 0;
@@ -112,9 +114,8 @@ public class DriveBase {
 	}
 	
 	public double CheckTurnSensitivityFilter( double _turn) {
-		/*  Described in Drive Train Class Specification as
-		 *  Sensitivity High -- used on chessy turn control
-		 *  Apply a sin function that is scaled
+		/*  Used for chessy turn, developed by team 254 for the turn
+		 * stick to provide a more realistic feel for turning
 		 */
 		double fTurn = _turn;
 		if (driver.GetTurnSensitivityEnabled()) {
@@ -131,24 +132,57 @@ public class DriveBase {
 	}
 
 	
-	public double CheckThrottleSensitivity( double _throttle) {
-		double fThrottle = _throttle;
-		int exp = 3;
-		
-		//  I don't have this one right yet...
-		
-
-		if (driver.GetThrottleSensitivityEnabled()) {			
-			if (lowSpeedFactorEnabled) {
-				fThrottle = TeleConfig.kThrottleSensitivityLowGain*(Math.pow(fThrottle, exp)) +
-						(1 - TeleConfig.kThrottleSensitivityLowGain*fThrottle);
-			} else {	
-				fThrottle = TeleConfig.kThrottleSensitivityHighGain*(Math.pow(fThrottle, exp)) +
-						(1 - TeleConfig.kThrottleSensitivityHighGain*fThrottle);		
-			}
-			
+	public double SineAdjustment(double _value){
+		double adjustedValue = _value;
+		if (_value < 0){
+			adjustedValue = (2 * (-(Math.pow(_value, 3)))) - (3 * (Math.pow(_value, 2)));
+		} else if (_value > 0){
+			adjustedValue =(3 * (Math.pow(_value, 2)))  - (2 * (-(Math.pow(_value, 3))));			
 		}
-		
+		return adjustedValue;
+	}
+
+	
+	
+
+	
+	public double CheckThrottleSensitivity( double _throttle) {
+		/*
+		 * Sensitivity modifies the input value to provide a different feel of robot motion to the 
+		 * operator. There are several sensitivity curves that adjust the operator input for
+		 *  driving the robot.
+             - Linear sensitivity curve: The action is linear for the operator, output == input
+             - Sine wave sensitivity: The sensitivity provides a larger do little around zero speed 
+                and near full speed. This the typical elevator curve.
+             - Squared sensitivity curve: This sensitivity slows down the response of the robot to 
+               fast moves on the part of the operator.
+             - Cubed sensitivity curve: This sensitivity really slows down the response of the robot.
+		 */
+		double fThrottle = _throttle;
+
+		switch (driver.GetThrottleSensitivity()) {
+		  case Linear:
+			  // no change
+			  break;
+			  
+		  case Sine:
+			  fThrottle = SineAdjustment(_throttle);
+			  break;
+			  
+		  case Squared:
+			  fThrottle = (Math.pow(_throttle, 2));
+			  break;
+			  
+		  case Cubed:
+			  fThrottle = ( TeleConfig.kThrottleCubedGain * (Math.pow(_throttle, 3)) )
+			              + ( (1-TeleConfig.kThrottleCubedGain)*_throttle );
+			  break;
+			  
+		  default:
+			  // complain about an unrecognized setting
+			  break;
+	
+		}		
 		return fThrottle;
 	}
 	
@@ -167,47 +201,39 @@ public class DriveBase {
 	public double CheckSmoothMove( double _throttle) {
 		double fThrottle = _throttle;
 		double deltaValue = fThrottle - previousEMAValue;
-		int timePeriodSF = 0;
-		
-		if (driver.GetSmoothMoveEnabled()) {
-			// check if the requested throttle is going in the same previous direction
-			if (Math.signum(fThrottle) == Math.signum(previousEMAValue)) {
-							
-				// prevent tipping if delta is too big apply a larger limit
-				if (Math.abs(deltaValue) > TeleConfig.MAX_DELTA_VELOCITY) {
-					timePeriodSF = TeleConfig.HIGH_SMOOTH;
-					System.out.println("delta value >" + TeleConfig.MAX_DELTA_VELOCITY);
-				} else {
-					timePeriodSF = TeleConfig.LOW_SMOOTH;
-				}			
-			} else { // driver has switched directions, we're tipping!
-				fThrottle = 0;
-				timePeriodSF = TeleConfig.HIGH_SMOOTH;
-				System.out.println("tipping?");
-			}
-			/*
-			* Exponential Moving Average Filter (EMA) is a recursive low pass filter
-			* that can change its gain to address filter response
-			* Range of smoothFactor is 0 to 1; where smoothFactor = 0 (no smoothing)
-			* smoothFactor = .99999 high smoothing
-			* Typically: smoothFactor = 1-(2.0 / (timePeriodSF + 1)) where user
-			* decides on approx number of cycles(timePeriodSF) for output = input. 
-			* Time period on iterative robot is approx 20ms
-			*/
-			double smoothFactor = 2.0 / (timePeriodSF + 1);
-			fThrottle = previousEMAValue + (smoothFactor) * (deltaValue);
-			previousEMAValue = fThrottle;
-			
-			// If we are within the zero speed dead band set the gain for a high
-			// response filter(low smoothing) and set the speed to zero <-- ?
-			if (Math.abs(previousEMAValue) < TeleConfig.ZERO_DEAD_BAND) {
-		      timePeriodSF = TeleConfig.LOW_SMOOTH;
-		      System.out.println("previousEMA" + previousEMAValue + "<" + TeleConfig.ZERO_DEAD_BAND);
-			}
-			
+
+		//		if (driver.GetSmoothMoveEnabled()) {
+		if ((fThrottle > 0) && (previousEMAValue < -TeleConfig.ZERO_DEAD_BAND)) // || ((value < 0) &&
+														// (oldEMA > 0))){
+		{
+			// we're tipping!!
+			fThrottle = 0;
+			timePeriodSF = TeleConfig.kHighSmoothPeriod;
+			// System.out.println("Tipping forward");
 		}
-		return fThrottle;
+		else if ((fThrottle < 0) && (previousEMAValue > TeleConfig.ZERO_DEAD_BAND))
+		{// we're tipping!!
+			fThrottle = 0;
+			timePeriodSF = TeleConfig.kHighSmoothPeriod;
+			// System.out.println("tipping backward");
+		}
+
+		double smoothFactor = 2.0 / (timePeriodSF + 1);
+		fThrottle = previousEMAValue + smoothFactor * (fThrottle - previousEMAValue);
+
+		if (Math.abs(previousEMAValue) < TeleConfig.ZERO_DEAD_BAND)
+		{
+			timePeriodSF = TeleConfig.kLowSmoothPeriod;
+		}
+
+		previousEMAValue = fThrottle;
+		
+		//SmartDashboard.putNumber("smooth", value);
+		
+        return fThrottle;		
 	}
+
+		
 	/** 
 	* TippingFilter
 	* Team/Date/Author:
@@ -230,7 +256,7 @@ public class DriveBase {
 		double value = _value;
 		// determine change for last joystick read
 		double deltaValue = value - previousEMAValue;
-		double smoothFactor = 1.0;
+		double timePeriodSF = 0.0;
 		
 		// Check joystick value transition from one side of zero to the other side of zero
 		if (Math.signum(value) != Math.signum(previousEMAValue)){
@@ -238,40 +264,38 @@ public class DriveBase {
 			// If joystick change is large enough to cause a wheelie or cause the
 			// robot to start to tip - the robot intervenes to see that this does
 			// not occur The following limits the change in joystick movement
-			if (Math.abs(deltaValue) > TeleConfig.MAX_DELTA_VELOCITY){
-				smoothFactor = TeleConfig.HIGH_SMOOTH;
+			if (Math.abs(deltaValue) > TeleConfig.kTransitionMaxDelta){
+				smoothFactor = TeleConfig.kTransitionSmoothFactor;
 			} else {	
 			
 				// If driver behaves
-				smoothFactor = TeleConfig.LOW_SMOOTH;
+				smoothFactor = TeleConfig.klowSmoothFactor;
 			}
 		}
 		
 		// Determine if the sign of value and oldEMA are the same
 		else if (Math.signum(value) == Math.signum(previousEMAValue)){
 				
-				// If joystick change is large enough to cause a wheelie or cause the
-				// robot to start to tip - the robot intervenes to see that this does
-				// not occur The following limits the change in joystick movement
-				if (Math.abs(deltaValue) > TeleConfig.MAX_DELTA_VELOCITY){
-					smoothFactor = TeleConfig.HIGH_SMOOTH;
+			// Check for large deltaValue that may cause a wheelie or 
+			// rotation torque to a high Center of gravity on decel
+
+				if (Math.abs(deltaValue) > TeleConfig.kMaxDeltaVelocity){
+					smoothFactor = TeleConfig.kHighSmoothFactor;
 				} else {	
 				
 					// If driver behaves
-					smoothFactor = TeleConfig.LOW_SMOOTH;
+					smoothFactor = TeleConfig.klowSmoothFactor;
 				}
 		}
 		
 		// Check if the smoothing filter is within the joystick deadband and put filter in high response gain
-		else if (Math.abs(previousEMAValue) < TeleConfig.ZERO_DEAD_BAND) {
-			deltaValue = 0;
-			previousEMAValue = 0;
-			smoothFactor = TeleConfig.LOW_SMOOTH;
-		} 
-		
+		if (Math.abs(value) < TeleConfig.ZERO_DEAD_BAND) {
+			value = 0;  // not previousValue?
+			smoothFactor = TeleConfig.klowSmoothFactor;
+		} 		
 		// Run through smoothing filter	
 		/* 
-		*Expoential Avg Filter (EMA) is a recursive low pass filter that
+		*Exponential Avg Filter (EMA) is a recursive low pass filter that
 		* can change it's gain to address filter response
 		* 
 		* Range of smoothFactor is 0 to 1; where smoothFactor = 0 (no smoothing)
@@ -279,16 +303,17 @@ public class DriveBase {
 		* Typical smoothFactor = 1-(2.0 / (timePeriodSF + 1)) where user decides
 		* on aprox number of cycles for output = input. Time period on
 		* iterative robot class is aprox 20ms
-		*/
-		// This is the value of the joystick speed after going through the
-		// tipping filter
-		value = previousEMAValue + (1-smoothFactor) * (deltaValue);
+		*/		
+		
+		value = previousEMAValue + smoothFactor * (value - previousEMAValue);
 		previousEMAValue = value;
+		
 		return value;
 	}
 	
 	
 	public double ApplySineFunction(double _turn) {
+		// kTurnSensitivityHighGain should be 0.1 to 1.0 used for chezy turn control
 		double factor = Math.PI/2.0 * TeleConfig.kTurnSensitivityHighGain;
 		return Math.sin(factor * _turn)/Math.sin(factor);
 	}
@@ -344,5 +369,17 @@ public class DriveBase {
 		}	
 	}
 	
+	/*
+	 * helper function to keep inside of acceptable %power range
+	 */
+	protected static double limit(double num) {
+	    if (num > 1.0) {
+	      return 1.0;
+	    }
+	    if (num < -1.0) {
+	      return -1.0;
+	    }
+	    return num;
+	  }
 
 }

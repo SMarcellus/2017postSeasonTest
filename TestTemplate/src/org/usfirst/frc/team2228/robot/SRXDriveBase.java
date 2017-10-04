@@ -108,26 +108,23 @@ public class SRXDriveBase extends DriveBase {
 		//double originalThrottle;
 		//double originalTurn;
 		
-		switch (driver.GetDriveStyle()) {
-		case chessyStyle: {
-			// retrieve the requested input from the driver
+		// assume chessy style drive for now, may need other class
+		// implementations for tank, arcade, mecanum, etc.
+		
+		
 			throttleValue = driver.GetThrottle();
 	    	turnValue = driver.GetTurn();
 			
-			turnValue = CheckTurnSensitivityFilter(turnValue);
-			throttleValue = CheckThrottleSensitivity(throttleValue);
-			throttleValue = CheckSmoothMove(throttleValue);
+			turnValue = CheckTurnSensitivityFilter(limit(turnValue));
+			throttleValue = CheckThrottleSensitivity(limit(throttleValue));
+			throttleValue = CheckSmoothMove(limit(throttleValue));
 			AdjustForControllerDeadBand();
 			CheckForAdjustSpeedRequest();
-			AdjustForDriveLimits();
 			
 			drive.arcadeDrive(throttleValue, turnValue, false);
-			break;
-		}
-		default:
-			break;
-		}
-	}/*
+
+	}
+	/*
 	* Test programs to calibrate the robot drive system
 	*/
 	/**
