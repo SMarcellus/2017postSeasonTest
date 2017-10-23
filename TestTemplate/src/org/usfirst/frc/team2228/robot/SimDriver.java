@@ -1,7 +1,5 @@
 package org.usfirst.frc.team2228.robot;
 
-import edu.wpi.first.wpilibj.Joystick;
-
 public class SimDriver implements DriverIF {
 	
 	// test program can write to these directly for testing
@@ -17,8 +15,8 @@ public class SimDriver implements DriverIF {
 	
 	public boolean quickTurnLeft = false;
 	public boolean quickTurnRight = false;
-	public DriverIF.ControllerSensitivity turnSensitivity = DriverIF.ControllerSensitivity.Normal;
-	public DriverIF.ControllerSensitivity throttleSensitivity = DriverIF.ControllerSensitivity.Normal;
+	public DriverIF.ControllerSensitivity turnSensitivity = DriverIF.ControllerSensitivity.Linear;
+	
 	public boolean  smoothMoveOn = true;
 	public boolean  lowSpeedTriggered = false;
 	public boolean  highSpeedTriggered = false;
@@ -78,14 +76,10 @@ public class SimDriver implements DriverIF {
 		return quickTurnRight;
 	}
 
-	@Override
-	public ControllerSensitivity GetTurnSensitivity() {
-		return turnSensitivity;
-	}
 
 	@Override
 	public ControllerSensitivity GetThrottleSensitivity() {
-		return throttleSensitivity;
+		return ControllerSensitivity.Linear;
 	}
 
 	

@@ -1,13 +1,17 @@
 package org.usfirst.frc.team2228.robot;
 import com.ctre.CANTalon;
+
 import com.ctre.CANTalon.FeedbackDevice;
 import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-public class SRXDriveBase extends DriveBase {
+/*
+ *   Tank drive base refers to how the hardware is configured, with
+ *   two master controllers, each one drives one side of the robot.
+ */
+public class TankSRXDriveBase extends DriveBase {
 	private RobotDrive drive;
 	
 	// drive motor controllers
@@ -22,7 +26,7 @@ public class SRXDriveBase extends DriveBase {
 	private short lastChoice = 0;
 	
 	// Constructor
-	public SRXDriveBase(DriverIF _driver)
+	public TankSRXDriveBase(DriverIF _driver)
 	{
 		super(_driver);
 			

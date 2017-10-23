@@ -66,26 +66,21 @@ public class Driver implements DriverIF {
 	public boolean QuickTurnRight() {
 		return controller.getRawButton(DriverConfig.quickTurnRight);
 	}
-
-	
-	public ControllerSensitivity GetTurnSensitivity() {
-		return DriverConfig.sensitivity;
-	}
 	
 	public ControllerSensitivity GetThrottleSensitivity() {
 		return  DriverConfig.sensitivity;
 	}
 	
 	public boolean GetTurnSensitivityEnabled() {
-		return false;
+		return (DriverConfig.turnSensitivityEnabled);
 	}
 	
 	public boolean GetThrottleSensitivityEnabled() {
-		return  false;
+		return (DriverConfig.sensitivity != DriverIF.ControllerSensitivity.Linear );
 	}
 	
 	public boolean GetSmoothMoveEnabled() {
-		return true;
+		return DriverConfig.smoothMoveEnabled;
 	}
 	
 	public boolean GetLowSpeedTriggered(){

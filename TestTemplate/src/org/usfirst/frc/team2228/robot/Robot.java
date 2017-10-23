@@ -20,7 +20,7 @@ public class Robot extends IterativeRobot {
     SendableChooser chooser;
     private Joystick joystick;
     private Driver driver;
-    private SRXDriveBase driveBase;
+    private TankSRXDriveBase driveBase;
     
 	
     /**
@@ -39,7 +39,7 @@ public class Robot extends IterativeRobot {
 		joystick = new Joystick(1/*RobotMap.RIGHT_SIDE_JOYSTICK_ONE*/);
 		driver = new Driver(joystick);
 		// generic drive base
-		driveBase = new SRXDriveBase(driver);
+		driveBase = new TankSRXDriveBase(driver);
     }
     
 	/**

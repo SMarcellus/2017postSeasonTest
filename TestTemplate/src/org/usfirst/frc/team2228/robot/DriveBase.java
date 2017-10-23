@@ -35,7 +35,7 @@ public class DriveBase {
 	
 	// smooth move parameters
 	public double previousEMAValue = 0.0; // -1 to 1
-	public int timePeriodSF =  TeleConfig.kHighSmoothPeriod;
+	public int timePeriodSF =  TeleopConfig.kHighSmoothPeriod;
 	// tipping filter
 	protected double smoothFactor = 1.0;
 	
@@ -174,8 +174,8 @@ public class DriveBase {
 			  break;
 			  
 		  case Cubed:
-			  fThrottle = ( TeleConfig.kThrottleCubedGain * (Math.pow(_throttle, 3)) )
-			              + ( (1-TeleConfig.kThrottleCubedGain)*_throttle );
+			  fThrottle = ( TeleopConfig.kThrottleCubedGain * (Math.pow(_throttle, 3)) )
+			              + ( (1-TeleopConfig.kThrottleCubedGain)*_throttle );
 			  break;
 			  
 		  default:
@@ -203,27 +203,27 @@ public class DriveBase {
 		double deltaValue = fThrottle - previousEMAValue;
 
 		//		if (driver.GetSmoothMoveEnabled()) {
-		if ((fThrottle > 0) && (previousEMAValue < -TeleConfig.ZERO_DEAD_BAND)) // || ((value < 0) &&
+		if ((fThrottle > 0) && (previousEMAValue < -TeleopConfig.ZERO_DEAD_BAND)) // || ((value < 0) &&
 														// (oldEMA > 0))){
 		{
 			// we're tipping!!
 			fThrottle = 0;
-			timePeriodSF = TeleConfig.kHighSmoothPeriod;
+			timePeriodSF = TeleopConfig.kHighSmoothPeriod;
 			// System.out.println("Tipping forward");
 		}
-		else if ((fThrottle < 0) && (previousEMAValue > TeleConfig.ZERO_DEAD_BAND))
+		else if ((fThrottle < 0) && (previousEMAValue > TeleopConfig.ZERO_DEAD_BAND))
 		{// we're tipping!!
 			fThrottle = 0;
-			timePeriodSF = TeleConfig.kHighSmoothPeriod;
+			timePeriodSF = TeleopConfig.kHighSmoothPeriod;
 			// System.out.println("tipping backward");
 		}
 
 		double smoothFactor = 2.0 / (timePeriodSF + 1);
 		fThrottle = previousEMAValue + smoothFactor * (fThrottle - previousEMAValue);
 
-		if (Math.abs(previousEMAValue) < TeleConfig.ZERO_DEAD_BAND)
+		if (Math.abs(previousEMAValue) < TeleopConfig.ZERO_DEAD_BAND)
 		{
-			timePeriodSF = TeleConfig.kLowSmoothPeriod;
+			timePeriodSF = TeleopConfig.kLowSmoothPeriod;
 		}
 
 		previousEMAValue = fThrottle;
@@ -264,12 +264,12 @@ public class DriveBase {
 			// If joystick change is large enough to cause a wheelie or cause the
 			// robot to start to tip - the robot intervenes to see that this does
 			// not occur The following limits the change in joystick movement
-			if (Math.abs(deltaValue) > TeleConfig.kTransitionMaxDelta){
-				smoothFactor = TeleConfig.kTransitionSmoothFactor;
+			if (Math.abs(deltaValue) > TeleopConfig.kTransitionMaxDelta){
+				smoothFactor = TeleopConfig.kTransitionSmoothFactor;
 			} else {	
 			
 				// If driver behaves
-				smoothFactor = TeleConfig.klowSmoothFactor;
+				smoothFactor = TeleopConfig.klowSmoothFactor;
 			}
 		}
 		
@@ -279,19 +279,19 @@ public class DriveBase {
 			// Check for large deltaValue that may cause a wheelie or 
 			// rotation torque to a high Center of gravity on decel
 
-				if (Math.abs(deltaValue) > TeleConfig.kMaxDeltaVelocity){
-					smoothFactor = TeleConfig.kHighSmoothFactor;
+				if (Math.abs(deltaValue) > TeleopConfig.kMaxDeltaVelocity){
+					smoothFactor = TeleopConfig.kHighSmoothFactor;
 				} else {	
 				
 					// If driver behaves
-					smoothFactor = TeleConfig.klowSmoothFactor;
+					smoothFactor = TeleopConfig.klowSmoothFactor;
 				}
 		}
 		
 		// Check if the smoothing filter is within the joystick deadband and put filter in high response gain
-		if (Math.abs(value) < TeleConfig.ZERO_DEAD_BAND) {
+		if (Math.abs(value) < TeleopConfig.ZERO_DEAD_BAND) {
 			value = 0;  // not previousValue?
-			smoothFactor = TeleConfig.klowSmoothFactor;
+			smoothFactor = TeleopConfig.klowSmoothFactor;
 		} 		
 		// Run through smoothing filter	
 		/* 
@@ -314,7 +314,7 @@ public class DriveBase {
 	
 	public double ApplySineFunction(double _turn) {
 		// kTurnSensitivityHighGain should be 0.1 to 1.0 used for chezy turn control
-		double factor = Math.PI/2.0 * TeleConfig.kTurnSensitivityHighGain;
+		double factor = Math.PI/2.0 * TeleopConfig.kTurnSensitivityHighGain;
 		return Math.sin(factor * _turn)/Math.sin(factor);
 	}
 	
@@ -323,10 +323,10 @@ public class DriveBase {
 	 *  "deadband" usually set to 0.1 as an input 
 	 */
 	public void AdjustForControllerDeadBand() {
-		if (Math.abs(throttleValue) < TeleConfig.JOY_STICK_DEADBAND) {
+		if (Math.abs(throttleValue) < TeleopConfig.JOY_STICK_DEADBAND) {
 			throttleValue = 0;
 		}
-		if (Math.abs(turnValue) < TeleConfig.JOY_STICK_DEADBAND) {
+		if (Math.abs(turnValue) < TeleopConfig.JOY_STICK_DEADBAND) {
 			turnValue = 0;
 		}
 	
@@ -364,8 +364,8 @@ public class DriveBase {
 		
 		// If enabled - limit the robot top speed
 		if (lowSpeedFactorEnabled) {
-		  throttleValue *= TeleConfig.kLowMaxSpeedFactor;
-		  turnValue *= TeleConfig.kLowMaxSpeedFactor;
+		  throttleValue *= TeleopConfig.kLowMaxSpeedFactor;
+		  turnValue *= TeleopConfig.kLowMaxSpeedFactor;
 		}	
 	}
 	
