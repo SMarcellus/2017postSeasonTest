@@ -58,6 +58,16 @@ public class DriveBase {
 
 	public Date buildDate;
 	
+	/*
+	 *  MISSING TELEOP FUNCTIONS
+     * fastTurn(int direction) - MOVES AND TURNS ROBOT 180 DEG - THIS IS FUTURE
+     * WE GOING TO NEED A "PID" CLASS FOR HEADING THAT ASSISTS DRIVING STRAIGHT
+
+     * AUTONOMOUS FUNCTIONS MISSING
+     * MOVE - MOVES ROBOT FOR/REV
+     * TURN - TURNS ROBOT SO MANY DEGREES
+	 */
+	
 
 	// Constructor
 	public DriveBase(DriverIF _driver)
@@ -78,6 +88,8 @@ public class DriveBase {
 	public DriveBase() {
 		// TODO Auto-generated constructor stub
 	}
+	
+	/************************** Autonomous Functions ******************************/
 	
 	/*  indexDistanceIn is the requested distance to move in inches
 	 *  indexTime is the timeout value the move must be made within
@@ -112,6 +124,9 @@ public class DriveBase {
 	public boolean rotateRobot(double heading) {
 		return true;
 	}
+	
+	
+	/************************** Teleop Filtering Functions ******************************/
 	
 	public double CheckTurnSensitivityFilter( double _turn) {
 		/*  Used for chessy turn, developed by team 254 for the turn
@@ -349,6 +364,9 @@ public class DriveBase {
 	* Check for low max speed operation and limit speed by low speed factor
 	*/	
 	public void CheckForAdjustSpeedRequest() {
+		/*
+		 * This is a toggle on button - press on - press off  (rumble?)
+		 */
 		boolean currentLowSpeedTriggered = driver.GetLowSpeedTriggered();
 		
 		if (currentLowSpeedTriggered && !lowSpeedTriggered  // this is a change

@@ -1,6 +1,8 @@
 
 package org.usfirst.frc.team2228.robot;
 
+import java.io.File;
+
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
@@ -35,7 +37,11 @@ public class Robot extends IterativeRobot {
 
         // put axis and button mapping in DriverConfig
 
-		DebugLogger.init("/home/lvuser/log/Debug");
+		File _logDirectory = new File("/home/lvuser/log");
+		if (!_logDirectory.exists()) {
+			_logDirectory.mkdir();
+		}
+		DebugLogger.init("/home/lvuser/log/Debug_");
 		joystick = new Joystick(1/*RobotMap.RIGHT_SIDE_JOYSTICK_ONE*/);
 		driver = new Driver(joystick);
 		// generic drive base
@@ -55,22 +61,14 @@ public class Robot extends IterativeRobot {
     	autoSelected = (String) chooser.getSelected();
 //		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
-		driveBase.autonomousInit();
+		//  auto.autonomousInit(autoSelected);
     }
 
     /**
      * This function is called periodically during autonomous
      */
     public void autonomousPeriodic() {
-    	switch(autoSelected) {
-    	case customAuto:
-        //Put custom auto code here   
-            break;
-    	case defaultAuto:
-    	default:
-    	//Put default auto code here
-            break;
-    	}
+    //  auto.autonomousPeriodic();
     }
 
     /*   
@@ -84,8 +82,7 @@ public class Robot extends IterativeRobot {
      * This function is called periodically during operator control
      */
     public void teleopPeriodic() {
-
-		driveBase.autonomousInit();
+		driveBase.teleopPeriodic();
     }
     /*   
      * *Initialization code for test mode should go here

@@ -18,13 +18,14 @@ public class DriverConfig {
     public static int slowSpeedEnable = XBoxConfig.LEFT_TRIGGER;
     public static int highSpeedEnable = XBoxConfig.RIGHT_TRIGGER;
     // undefined
-    public static int throttleSensitivityEnabled = 0;
-    public static int enableChessyDrive = 0;
-    public static int enableTankDrive = 0;
-    public static int breakawayRight180 = 0;
-    public static int breakawayLeft180 = 0;
-    public static int quickTurnLeft = 0;
-    public static int quickTurnRight = 0;
+    public static int INPUT_UNDEFINED = 99;
+    public static int throttleSensitivityEnabled = INPUT_UNDEFINED;
+    public static int enableChessyDrive = INPUT_UNDEFINED;
+    public static int enableTankDrive = INPUT_UNDEFINED;
+    public static int breakawayRight180 = INPUT_UNDEFINED;
+    public static int breakawayLeft180 = INPUT_UNDEFINED;
+    public static int quickTurnLeft = INPUT_UNDEFINED;
+    public static int quickTurnRight = INPUT_UNDEFINED;
 
 	public static DriverIF.DriveStyle myStyle = DriverIF.DriveStyle.chessyStyle;
 	public static boolean isPIDEnabled = false;

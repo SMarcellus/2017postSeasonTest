@@ -1,5 +1,8 @@
 package org.usfirst.frc.team2228.robot;
 
+import org.omg.CORBA.RepositoryIdHelper;
+import java.io.File;
+
 public class TestMain {
 	public static SimDriver driver;
 	public static DriveBase driveBase;
@@ -87,7 +90,7 @@ public class TestMain {
 		System.out.println(dMultiplier + " vs. ");
 		float ftop = 7;
 		float fbottom = 6;
-		dMultiplier = ftop/ftop;                  // BAD
+		dMultiplier = ftop/fbottom;                  // BAD
 		System.out.println(dMultiplier + " vs. ");
 		int itop = 7;
 		int ibottom = 6;
@@ -104,6 +107,10 @@ public class TestMain {
 	}
 
 	public static void main(String[] args){
+		File _logDirectory = new File("C:/temp/test");
+		if (!_logDirectory.exists()) {
+			_logDirectory.mkdir();
+		}
 		DebugLogger.init("C:/temp/test/Debug_");
 	    driver = new SimDriver();
         driveBase = new DriveBase((DriverIF)driver);
@@ -111,6 +118,8 @@ public class TestMain {
         
         TestSmoothMove();
         TestTippingFilterMove();
+        
+        //Repository existingRepo = new FileRepositoryBuilder()
         
         /*
          *  
