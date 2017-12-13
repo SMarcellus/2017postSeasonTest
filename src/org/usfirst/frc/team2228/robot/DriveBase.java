@@ -1,6 +1,5 @@
 package org.usfirst.frc.team2228.robot;
 
-
 import java.io.File;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -73,7 +72,7 @@ public class DriveBase {
 	public DriveBase(DriverIF _driver)
 	{
       driver = _driver;
-      
+      /*
       // keep its build date for reference
       try {
 		buildDate = new Date(
@@ -83,6 +82,7 @@ public class DriveBase {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	  }
+	  */
 	}
 	
 	public DriveBase() {
@@ -401,3 +401,4 @@ public class DriveBase {
 	  }
 
 }
+

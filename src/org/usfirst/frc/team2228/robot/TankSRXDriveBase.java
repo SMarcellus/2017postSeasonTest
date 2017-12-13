@@ -6,12 +6,13 @@ import com.ctre.CANTalon.TalonControlMode;
 
 import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /*
  *   Tank drive base refers to how the hardware is configured, with
  *   two master controllers, each one drives one side of the robot.
  */
-public class TankSRXDriveBase extends DriveBase {
+public class TankDriveBase extends DriveBase {
 	private RobotDrive drive;
 	
 	// drive motor controllers
@@ -24,16 +25,17 @@ public class TankSRXDriveBase extends DriveBase {
 	private boolean isActiveHighTime = false;
 	private double squareStartTime = 0;
 	private short lastChoice = 0;
+	private short loggerIterations = 0;
+	private short loggerThreshold = 20;
 	
 	// Constructor
-	public TankSRXDriveBase(DriverIF _driver)
+	public TankDriveBase(DriverIF _driver)
 	{
 		super(_driver);
-			
-		right1 = new CANTalon(SRXConfig.RIGHT_ONE_DRIVE); // master
-		right2 = new CANTalon(SRXConfig.RIGHT_TWO_DRIVE);
-		left1 = new CANTalon(SRXConfig.LEFT_ONE_DRIVE);  // master
-		left2 = new CANTalon(SRXConfig.LEFT_TWO_DRIVE);
+		right1 = new CANTalon(RobotMap.CAN_ID_1); // master
+		right2 = new CANTalon(RobotMap.CAN_ID_2);
+		left1 = new CANTalon(RobotMap.CAN_ID_3);  // master
+		left2 = new CANTalon(RobotMap.CAN_ID_4);
 		
 		if (SRXConfig.RIGHT_ENCODER_ENABLED)
 		{
@@ -44,8 +46,13 @@ public class TankSRXDriveBase extends DriveBase {
 		{
 			left1.setFeedbackDevice(SRXConfig.LEFT_FEEDBACK);
 		}
+		LiveWindow.addActuator("rtMaster", "RtTalonMaster", right1);
+		LiveWindow.addActuator("rtFollower", "RtTalonFollower", right2);
+		LiveWindow.addActuator("lftMaster", "LtTalonMaster", left1);
+		LiveWindow.addActuator("lftFollower", "LtTalonFollower", left2);
 		
 		right1.changeControlMode(SRXConfig.RIGHT_1_MODE);
+		right1.enableControl();
 		right2.changeControlMode(SRXConfig.RIGHT_2_MODE);
 		if (SRXConfig.RIGHT_2_MODE == TalonControlMode.Follower) {
 			right2.set(right1.getDeviceID());
@@ -53,6 +60,7 @@ public class TankSRXDriveBase extends DriveBase {
 		}
 			
 		left1.changeControlMode(SRXConfig.LEFT_1_MODE);
+		left1.enableControl();
 		left2.changeControlMode(SRXConfig.LEFT_2_MODE);
 		if (SRXConfig.LEFT_2_MODE == TalonControlMode.Follower) {
 			left2.set(left1.getDeviceID());
@@ -76,6 +84,7 @@ public class TankSRXDriveBase extends DriveBase {
 		right2.enableBrakeMode(SRXConfig.BRAKE_MODE_ENABLED);
 		left1.enableBrakeMode(SRXConfig.BRAKE_MODE_ENABLED);
 		left2.enableBrakeMode(SRXConfig.BRAKE_MODE_ENABLED);
+		
 	}
 
 
@@ -101,23 +110,18 @@ public class TankSRXDriveBase extends DriveBase {
 	}
 	
 	public void teleopInit(){
-
-		right1.changeControlMode(TalonControlMode.PercentVbus);
-		right1.set(0);
-		left1.changeControlMode(TalonControlMode.PercentVbus);	
-		left1.set(0);
 	}
 	
 	public void teleopPeriodic(){
-		//double originalThrottle;
-		//double originalTurn;
+		double originalThrottle;
+		double originalTurn;
 		
 		// assume chessy style drive for now, may need other class
 		// implementations for tank, arcade, mecanum, etc.
 		
 		
-			throttleValue = driver.GetThrottle();
-	    	turnValue = driver.GetTurn();
+		originalThrottle = throttleValue = driver.GetThrottle();
+		originalTurn = turnValue = driver.GetTurn();
 			
 			turnValue = CheckTurnSensitivityFilter(limit(turnValue));
 			throttleValue = CheckThrottleSensitivity(limit(throttleValue));
@@ -126,6 +130,16 @@ public class TankSRXDriveBase extends DriveBase {
 			CheckForAdjustSpeedRequest();
 			
 			drive.arcadeDrive(throttleValue, turnValue, false);
+			
+			loggerIterations++;
+			if (loggerIterations >= loggerThreshold)
+			{
+				/*
+				DebugLogger.log(originalThrottle + 
+						"," + originalTurn + 
+				        "," + throttleValue + 
+				        "," + turnValue);*/
+			}
 
 	}
 	/*
@@ -138,34 +152,13 @@ public class TankSRXDriveBase extends DriveBase {
 	* square wave will be generated for PID tuning
 	*/
     public void testInit() {  
-    	SmartDashboard.putNumber("runTest", 0);
     }
     
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-    	// some way to choose a test function 	
-    	short choice = (short)SmartDashboard.getNumber("runTest", 0);
-    	boolean newRequest =  (lastChoice != choice);
-    	lastChoice = choice;
-    	switch (choice) {
-    	  case 1: {
-    		  
- 
-    		  if (newRequest) {
-    		   System.out.println("start choice 1");
-    		  }
-    	  break;
-    	  }
-    	  
-    	  default: {
-    		  if (newRequest){
-       		   System.out.println("choice defaulted");
-       		  }
-    	  }
-    		   
-    	}
+    	// some way to choose a test function 
     }
     	
 
@@ -194,13 +187,13 @@ public class TankSRXDriveBase extends DriveBase {
     		  }
     		  
     		  if (isActiveHighTime) {
-    			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
+    			if (driveTrainSide == RobotMap.CAN_ID_1) {
     				right1.set(SRXConfig.K_RIGHT_HIGH_SPEED);
     			} else {
     				left1.set(SRXConfig.K_LEFT_HIGH_SPEED);
     			}
     		  } else {
-    			if (driveTrainSide == SRXConfig.RIGHT_ONE_DRIVE) {
+    			if (driveTrainSide == RobotMap.CAN_ID_1) {
     				right1.set(SRXConfig.K_RIGHT_LOW_SPEED);
     			} else {
     				left1.set(SRXConfig.K_LEFT_LOW_SPEED);
@@ -221,5 +214,6 @@ public class TankSRXDriveBase extends DriveBase {
     	 
     }
     
+
 
 

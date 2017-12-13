@@ -1,4 +1,7 @@
 package org.usfirst.frc.team2228.robot;
+
+import org.usfirst.frc.team2228.robot.DriverIF.ControllerSensitivity;
+import org.usfirst.frc.team2228.robot.DriverIF.DriveStyle;
 /*
  * This class provides a generic interface for the driver's intent to the drive base code. 
  * The goal is the isolate what changes year to year with each driver's preference from

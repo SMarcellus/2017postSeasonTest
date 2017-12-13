@@ -1,4 +1,8 @@
-package org.usfirst.frc.team2228.robot;
+package org.usfirst.frc.team2228.testSim;
+
+import org.usfirst.frc.team2228.robot.DriverIF;
+import org.usfirst.frc.team2228.robot.DriverIF.ControllerSensitivity;
+import org.usfirst.frc.team2228.robot.DriverIF.DriveStyle;
 
 public class SimDriver implements DriverIF {
 	

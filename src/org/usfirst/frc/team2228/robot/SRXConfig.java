@@ -6,15 +6,11 @@ import com.ctre.CANTalon.TalonControlMode;
 public class SRXConfig {
 
 	// CANTalon ID's
-		public static int RIGHT_ONE_DRIVE = 1;														
-		public static int RIGHT_TWO_DRIVE = 2;
-		public static int LEFT_ONE_DRIVE = 3;
-		public static int LEFT_TWO_DRIVE = 4;
 		
-		public static boolean RIGHT_ENCODER_ENABLED = true;
+		public static boolean RIGHT_ENCODER_ENABLED = false;
 		public static FeedbackDevice RIGHT_FEEDBACK = FeedbackDevice.QuadEncoder;
 		
-		public static boolean LEFT_ENCODER_ENABLED = true;
+		public static boolean LEFT_ENCODER_ENABLED = false;
 		public static FeedbackDevice LEFT_FEEDBACK = FeedbackDevice.QuadEncoder;
 		
 		public static TalonControlMode RIGHT_1_MODE = TalonControlMode.PercentVbus;

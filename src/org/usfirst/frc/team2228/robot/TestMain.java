@@ -1,7 +1,8 @@
-package org.usfirst.frc.team2228.robot;
+package org.usfirst.frc.team2228.testSim;
 
 import org.omg.CORBA.RepositoryIdHelper;
 import java.io.File;
+import org.usfirst.frc.team2228.robot.*;
 
 public class TestMain {
 	public static SimDriver driver;
@@ -131,3 +132,4 @@ public class TestMain {
         */
 	}
 }
+

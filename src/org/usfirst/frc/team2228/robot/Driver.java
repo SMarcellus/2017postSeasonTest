@@ -42,7 +42,7 @@ public class Driver implements DriverIF {
 
 	@Override
 	public double GetTurn() {
-		return controller.getY();
+		return controller.getRawAxis(DriverConfig.turn);
 	}
 
 	@Override

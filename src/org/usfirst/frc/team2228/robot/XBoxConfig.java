@@ -9,6 +9,7 @@ public class XBoxConfig {
 	public static int RIGHT_TRIGGER = 3;
 	public static int RIGHT_STICK_X_AXIS = 4;
 	public static int RIGHT_STICK_Y_AXIS = 5;
+	public static int UNKNOWN_AXIS_6 = 6;
 	// dunno the raw button numbers ids...
 	// getRawButton(int)
 	public static int A_BUTTON = 1;
@@ -21,6 +22,7 @@ public class XBoxConfig {
 	public static int START_BUTTON = 8;
 	public static int LEFT_STICK_BUTTON = 9;
 	public static int RIGHT_STICK_BUTTON = 10;
+	public static int UNKNOWN_BUTTON_11;
 	public static int SILVER_GUIDE_BUTTON = 13;
 	// pov
 	/*

@@ -6,6 +6,7 @@ import java.io.File;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 /**
@@ -16,13 +17,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * directory.
  */
 public class Robot extends IterativeRobot {
+	final String branchStr = "DriveBase";
+	final String versionStr = " 0.1.4";
     final String defaultAuto = "Default";
     final String customAuto = "My Auto";
     String autoSelected;
-    SendableChooser chooser;
+    SendableChooser<String> chooser;
     private Joystick joystick;
     private Driver driver;
-    private TankSRXDriveBase driveBase;
+    private TankDriveBase driveBase;
+    private TestMode testMode;
     
 	
     /**
@@ -30,22 +34,29 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
     public void robotInit() {
-        chooser = new SendableChooser();
+        // some way to check the code currently downloaded, need a better method
+        SmartDashboard.putString("version #", (branchStr + versionStr));
+        
+    	// chooser default implementation, will move to an auto class
+        chooser = new SendableChooser<String>();
         chooser.addDefault("Default Auto", defaultAuto);
         chooser.addObject("My Auto", customAuto);
         SmartDashboard.putData("Auto choices", chooser);
 
         // put axis and button mapping in DriverConfig
-
+		joystick = new Joystick(RobotMap.JOYSTICK_1);
+		driver = new Driver(joystick);
+		
+		// generic drive base
+		driveBase = new TankDriveBase(driver);
+		testMode = new TestMode(joystick);  
+  
 		File _logDirectory = new File("/home/lvuser/log");
 		if (!_logDirectory.exists()) {
 			_logDirectory.mkdir();
 		}
 		DebugLogger.init("/home/lvuser/log/Debug_");
-		joystick = new Joystick(1/*RobotMap.RIGHT_SIDE_JOYSTICK_ONE*/);
-		driver = new Driver(joystick);
-		// generic drive base
-		driveBase = new TankSRXDriveBase(driver);
+		DebugLogger.log("robotInit" + branchStr + versionStr);
     }
     
 	/**
@@ -62,6 +73,8 @@ public class Robot extends IterativeRobot {
 //		autoSelected = SmartDashboard.getString("Auto Selector", defaultAuto);
 		System.out.println("Auto selected: " + autoSelected);
 		//  auto.autonomousInit(autoSelected);
+
+		DebugLogger.log("autoInit");
     }
 
     /**
@@ -76,7 +89,9 @@ public class Robot extends IterativeRobot {
      * @see edu.wpi.first.wpilibj.IterativeRobot#teleopInit()
      */
     public void teleopInit() {
-    	driveBase.teleopInit();    	
+    	driveBase.teleopInit();  
+
+		DebugLogger.log("teleopInit");
     }
     /**
      * This function is called periodically during operator control
@@ -89,15 +104,19 @@ public class Robot extends IterativeRobot {
      * @see edu.wpi.first.wpilibj.IterativeRobot#testInit()
      */
     public void testInit() {
-    	driveBase.testInit();    	
+    	//driveBase.testInit();
+    	//testMode.testInit();
+
+		DebugLogger.log("testInit");
     }
     
     /**
      * This function is called periodically during test mode
      */
     public void testPeriodic() {
-    	driveBase.testPeriodic();  
-    
+    	LiveWindow.run();
+    	//driveBase.testPeriodic();  
+    	//testMode.testPeriodic();
     }
     
 }
