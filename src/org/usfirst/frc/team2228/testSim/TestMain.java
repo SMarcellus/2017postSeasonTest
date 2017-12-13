@@ -5,7 +5,7 @@ import java.io.File;
 import org.usfirst.frc.team2228.robot.*;
 
 public class TestMain {
-	public static SimDriver driver;
+	public static org.usfirst.frc.team2228.testSim.SimDriver driver;
 	public static DriveBase driveBase;
 	
 	public static void TestTurnSensitivity(DriverIF.ControllerSensitivity turnS){
