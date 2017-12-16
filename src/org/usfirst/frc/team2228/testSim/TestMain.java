@@ -115,11 +115,11 @@ public class TestMain {
 		DebugLogger.init("C:/temp/test/Debug_");
 	    driver = new SimDriver();
         driveBase = new DriveBase((DriverIF)driver);
-        System.out.println(driveBase.buildDate);
+       // System.out.println(driveBase.buildDate);
         
         TestSmoothMove();
         TestTippingFilterMove();
-        
+        TestFloatVsDouble();
         //Repository existingRepo = new FileRepositoryBuilder()
         
         /*

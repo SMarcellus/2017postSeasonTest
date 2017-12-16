@@ -25,7 +25,7 @@ public class Robot extends IterativeRobot {
     SendableChooser<String> chooser;
     private Joystick joystick;
     private Driver driver;
-    private TankDriveBase driveBase;
+    private TankSRXDriveBase driveBase;
     private TestMode testMode;
     
 	
@@ -48,7 +48,7 @@ public class Robot extends IterativeRobot {
 		driver = new Driver(joystick);
 		
 		// generic drive base
-		driveBase = new TankDriveBase(driver);
+		driveBase = new TankSRXDriveBase(driver);
 		testMode = new TestMode(joystick);  
   
 		File _logDirectory = new File("/home/lvuser/log");

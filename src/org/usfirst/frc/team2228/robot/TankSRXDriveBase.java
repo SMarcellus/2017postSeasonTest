@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  *   Tank drive base refers to how the hardware is configured, with
  *   two master controllers, each one drives one side of the robot.
  */
-public class TankDriveBase extends DriveBase {
+public class TankSRXDriveBase extends DriveBase {
 	private RobotDrive drive;
 	
 	// drive motor controllers
@@ -29,7 +29,7 @@ public class TankDriveBase extends DriveBase {
 	private short loggerThreshold = 20;
 	
 	// Constructor
-	public TankDriveBase(DriverIF _driver)
+	public TankSRXDriveBase(DriverIF _driver)
 	{
 		super(_driver);
 		right1 = new CANTalon(RobotMap.CAN_ID_1); // master
